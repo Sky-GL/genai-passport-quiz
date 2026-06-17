@@ -25,6 +25,14 @@
     "scheme": "genai-passport",
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "4689c5e3-217c-466c-8a88-c3a4c03c0f22"
+      }
     }
   }
 }
