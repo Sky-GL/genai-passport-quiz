@@ -13,4 +13,7 @@ export type VocabCardRow = {
   state: number;
   last_review: string | null;
   created_at: string;
+  category: string | null;
+  related_words: string | null;
+  collocation: string | null;
 };

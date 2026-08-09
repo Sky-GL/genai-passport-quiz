@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getDueVocabCards } from "@/lib/supabase/vocab";
+import { getDueVocabCards, getVocabCategories } from "@/lib/supabase/vocab";
 import VocabSession from "@/components/VocabSession";
 import { DEFAULT_DAILY_GOAL } from "@/types";
 
-export default async function VocabPage() {
+type Props = {
+  searchParams: { category?: string };
+};
+
+export default async function VocabPage({ searchParams }: Props) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -15,7 +19,11 @@ export default async function VocabPage() {
     redirect("/login");
   }
 
-  const cards = await getDueVocabCards(DEFAULT_DAILY_GOAL);
+  const category = searchParams.category;
+  const [cards, categories] = await Promise.all([
+    getDueVocabCards(DEFAULT_DAILY_GOAL, category),
+    getVocabCategories(),
+  ]);
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-8">
@@ -26,12 +34,36 @@ export default async function VocabPage() {
         </Link>
       </div>
 
+      {categories.length > 0 && (
+        <div className="flex w-full max-w-[340px] flex-wrap gap-1.5">
+          <Link
+            href="/vocab"
+            className={`rounded-full px-3 py-1 text-xs font-bold no-underline ${
+              !category ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
+            }`}
+          >
+            すべて
+          </Link>
+          {categories.map((c) => (
+            <Link
+              key={c}
+              href={`/vocab?category=${encodeURIComponent(c)}`}
+              className={`rounded-full px-3 py-1 text-xs font-bold no-underline ${
+                category === c ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
+              }`}
+            >
+              {c}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {cards.length === 0 ? (
         <p className="py-16 text-center text-ink-muted">
           本日復習予定のカードはありません。
         </p>
       ) : (
-        <VocabSession cards={cards} />
+        <VocabSession key={category ?? "all"} cards={cards} />
       )}
     </main>
   );

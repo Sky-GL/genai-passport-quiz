@@ -100,6 +100,9 @@ export default function VocabSession({ cards }: Props) {
       <VocabCard
         front={current.front}
         back={current.back}
+        category={current.category}
+        relatedWords={current.related_words}
+        collocation={current.collocation}
         flipped={flipped}
         onFlip={() => setFlipped((f) => !f)}
       />
