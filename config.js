@@ -1,3 +1,5 @@
-// ⚠️ ここにAnthropicのAPIキーを入力してください
-// https://console.anthropic.com でAPIキーを取得できます
-export const ANTHROPIC_API_KEY = "REDACTED_ANTHROPIC_API_KEY";
+// ⚠️ APIキーは環境変数から読み込んでください（コード内に直接書かない）
+// .env に EXPO_PUBLIC_ANTHROPIC_API_KEY=sk-ant-... を設定してください（.envはgitignore対象）
+// EXPO_PUBLIC_ プレフィックスの環境変数はクライアントバンドルに埋め込まれるため、
+// 配布用ビルドではAPIキーが端末側から抽出され得る点に注意（サーバー経由の呼び出しへの移行を推奨）
+export const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY ?? "";
