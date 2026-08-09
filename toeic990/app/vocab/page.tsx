@@ -18,16 +18,16 @@ export default async function VocabPage() {
   const cards = await getDueVocabCards(DEFAULT_DAILY_GOAL);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 px-6 py-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">単語・文法SRS学習</h1>
-        <Link href="/dashboard" className="text-sm text-slate-500 underline">
+    <main className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-8">
+      <div className="flex w-full max-w-[340px] items-center justify-between">
+        <h1 className="font-heading text-lg font-bold text-ink">単語・文法SRS</h1>
+        <Link href="/dashboard" className="text-[13px] text-ink-muted no-underline">
           ダッシュボードへ戻る
         </Link>
       </div>
 
       {cards.length === 0 ? (
-        <p className="py-16 text-center text-slate-500">
+        <p className="py-16 text-center text-ink-muted">
           本日復習予定のカードはありません。
         </p>
       ) : (

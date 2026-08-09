@@ -7,6 +7,8 @@ import {
   rowToCard,
   updateVocabCardAfterReview,
 } from "@/lib/supabase/vocab";
+import { getUserStats, recordStudyActivity } from "@/lib/supabase/gamification";
+import { XP_BY_GRADE } from "@/lib/gamification";
 
 export async function submitVocabReview(cardId: string, grade: Grade) {
   const row = await getVocabCardById(cardId);
@@ -16,5 +18,16 @@ export async function submitVocabReview(cardId: string, grade: Grade) {
   const nextCard = gradeCard(currentCard, grade);
   await updateVocabCardAfterReview(cardId, nextCard);
 
+  const xp = XP_BY_GRADE[grade];
+  await recordStudyActivity(xp);
+
   revalidatePath("/vocab");
+  revalidatePath("/dashboard");
+
+  return { xp };
+}
+
+export async function getCurrentStreak(): Promise<number> {
+  const stats = await getUserStats();
+  return stats.current_streak;
 }
