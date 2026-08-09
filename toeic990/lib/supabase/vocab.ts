@@ -1,0 +1,62 @@
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Card } from "@/lib/fsrs";
+import type { VocabCardRow } from "@/types/vocab";
+
+export function rowToCard(row: VocabCardRow): Card {
+  return {
+    due: new Date(row.due),
+    stability: row.stability,
+    difficulty: row.difficulty,
+    elapsed_days: row.elapsed_days,
+    scheduled_days: row.scheduled_days,
+    reps: row.reps,
+    lapses: row.lapses,
+    state: row.state,
+    last_review: row.last_review ? new Date(row.last_review) : undefined,
+  };
+}
+
+export async function getDueVocabCards(limit = 30): Promise<VocabCardRow[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("vocab_cards")
+    .select("*")
+    .lte("due", new Date().toISOString())
+    .order("due", { ascending: true })
+    .limit(limit);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getVocabCardById(id: string): Promise<VocabCardRow | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("vocab_cards")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function updateVocabCardAfterReview(id: string, card: Card) {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("vocab_cards")
+    .update({
+      due: card.due.toISOString(),
+      stability: card.stability,
+      difficulty: card.difficulty,
+      elapsed_days: card.elapsed_days,
+      scheduled_days: card.scheduled_days,
+      reps: card.reps,
+      lapses: card.lapses,
+      state: card.state,
+      last_review: card.last_review ? card.last_review.toISOString() : null,
+    })
+    .eq("id", id);
+
+  if (error) throw error;
+}

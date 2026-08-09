@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -29,11 +30,15 @@ export default async function DashboardPage() {
 
         <section className="rounded-lg border border-slate-200 p-6">
           <h2 className="text-lg font-semibold">学習メニュー</h2>
-          <ul className="mt-3 flex flex-col gap-2 text-sm text-slate-600">
-            <li>単語・文法SRS学習（準備中）</li>
-            <li>模試形式演習（準備中）</li>
-            <li>リスニング（準備中）</li>
-            <li>弱点分析（準備中）</li>
+          <ul className="mt-3 flex flex-col gap-2 text-sm">
+            <li>
+              <Link href="/vocab" className="text-slate-900 underline">
+                単語・文法SRS学習
+              </Link>
+            </li>
+            <li className="text-slate-500">模試形式演習（準備中）</li>
+            <li className="text-slate-500">リスニング（準備中）</li>
+            <li className="text-slate-500">弱点分析（準備中）</li>
           </ul>
         </section>
       </main>
