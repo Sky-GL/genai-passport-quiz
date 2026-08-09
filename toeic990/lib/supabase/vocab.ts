@@ -16,17 +16,35 @@ export function rowToCard(row: VocabCardRow): Card {
   };
 }
 
-export async function getDueVocabCards(limit = 30): Promise<VocabCardRow[]> {
+export async function getDueVocabCards(limit = 30, category?: string): Promise<VocabCardRow[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("vocab_cards")
     .select("*")
     .lte("due", new Date().toISOString())
     .order("due", { ascending: true })
     .limit(limit);
 
+  if (category) {
+    query = query.eq("category", category);
+  }
+
+  const { data, error } = await query;
+
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getVocabCategories(): Promise<string[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("vocab_cards")
+    .select("category")
+    .not("category", "is", null);
+
+  if (error) throw error;
+  const unique = new Set((data ?? []).map((row) => row.category as string));
+  return Array.from(unique).sort();
 }
 
 export async function getDueVocabCardCount(): Promise<number> {
