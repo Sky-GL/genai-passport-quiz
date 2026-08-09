@@ -36,6 +36,7 @@ export default async function DashboardPage() {
   const reviewedToday = todayActivity.cardsReviewed;
   const progressCount = Math.min(reviewedToday, goal);
   const progressPct = Math.round((progressCount / goal) * 100);
+  const goalAchieved = reviewedToday >= goal;
   const remaining = Math.max(Math.min(goal - reviewedToday, dueCount), 0);
   const weeklyXpTotal = weeklyActivity.reduce((sum, d) => sum + d.xp, 0);
   const level = levelFromXp(userStats.total_xp);
@@ -61,9 +62,13 @@ export default async function DashboardPage() {
               >
                 残り{remaining}枚を復習する
               </Link>
-            ) : (
+            ) : goalAchieved ? (
               <p className="mt-1 text-[13px] font-medium opacity-85">
                 今日の目標を達成しました 🎉
+              </p>
+            ) : (
+              <p className="mt-1 text-[13px] font-medium opacity-85">
+                本日復習できるカードがありません
               </p>
             )}
           </div>
