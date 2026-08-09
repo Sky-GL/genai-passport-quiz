@@ -29,6 +29,17 @@ export async function getDueVocabCards(limit = 30): Promise<VocabCardRow[]> {
   return data ?? [];
 }
 
+export async function getDueVocabCardCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("vocab_cards")
+    .select("id", { count: "exact", head: true })
+    .lte("due", new Date().toISOString());
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function getVocabCardById(id: string): Promise<VocabCardRow | null> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase

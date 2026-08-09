@@ -2,20 +2,40 @@ import { signOut } from "@/app/login/actions";
 
 type Props = {
   email: string;
+  streak: number;
+  level: number;
 };
 
-export default function DashboardHeader({ email }: Props) {
+export default function DashboardHeader({ email, streak, level }: Props) {
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-      <span className="text-sm text-slate-600">{email}</span>
-      <form action={signOut}>
-        <button
-          type="submit"
-          className="text-sm font-medium text-slate-900 underline"
-        >
-          ログアウト
-        </button>
-      </form>
+    <header className="flex items-center justify-between bg-navy px-7 py-4">
+      <div className="flex items-center gap-5">
+        <span className="font-heading text-[17px] font-bold text-white">TOEIC 990</span>
+        {streak > 0 && (
+          <div className="flex items-center gap-1.5 rounded-full bg-accent-soft/15 px-3 py-1.5">
+            <span className="h-2 w-2 rounded-full bg-accent" />
+            <span className="font-heading text-[12.5px] font-bold text-[oklch(0.85_0.06_35)]">
+              {streak}日連続
+            </span>
+          </div>
+        )}
+        <div className="rounded-full bg-primary-soft/15 px-3 py-1.5">
+          <span className="font-heading text-[12.5px] font-bold text-[oklch(0.8_0.05_265)]">
+            Lv.{level}
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <span className="text-[13px] text-[oklch(0.75_0.01_265)]">{email}</span>
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="h-[34px] rounded-lg border border-[oklch(0.4_0.02_265)] px-3.5 text-[12.5px] font-medium text-[oklch(0.85_0.01_265)] transition hover:bg-white/5"
+          >
+            ログアウト
+          </button>
+        </form>
+      </div>
     </header>
   );
 }
