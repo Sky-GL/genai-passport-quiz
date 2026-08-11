@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Choice, MockTestResult, MockTestSet, Mode } from "@/types/mocktest";
-import { submitMockTest } from "@/app/mock-test/actions";
-import MockTestQuestionCard from "./MockTestQuestionCard";
+import { checkMockTestAnswerAction, submitMockTest } from "@/app/mock-test/actions";
+import MockTestQuestionCard, { type QuestionFeedback } from "./MockTestQuestionCard";
 
 type Phase = "select" | "session" | "results";
 
@@ -21,8 +21,10 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
   const [mode, setMode] = useState<Mode>("practice");
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, Choice>>({});
+  const [feedback, setFeedback] = useState<Record<string, QuestionFeedback>>({});
   const [result, setResult] = useState<MockTestResult | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isChecking, startChecking] = useTransition();
   const [remainingSeconds, setRemainingSeconds] = useState(0);
 
   const passageMap = useMemo(() => new Map(passages.map((p) => [p.id, p])), [passages]);
@@ -54,7 +56,18 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
     setRemainingSeconds(questions.length * SECONDS_PER_QUESTION);
     setIndex(0);
     setAnswers({});
+    setFeedback({});
     setPhase("session");
+  };
+
+  const handleSelect = (questionId: string, choice: Choice) => {
+    setAnswers((a) => ({ ...a, [questionId]: choice }));
+    if (mode === "practice" && !feedback[questionId] && !isChecking) {
+      startChecking(async () => {
+        const res = await checkMockTestAnswerAction(questionId, choice);
+        setFeedback((f) => ({ ...f, [questionId]: res }));
+      });
+    }
   };
 
   if (phase === "select") {
@@ -125,7 +138,8 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
           question={current}
           passage={passage}
           selected={answers[current.id] ?? null}
-          onSelect={(choice) => setAnswers((a) => ({ ...a, [current.id]: choice }))}
+          feedback={feedback[current.id] ?? null}
+          onSelect={(choice) => handleSelect(current.id, choice)}
         />
 
         <div className="flex w-full max-w-[560px] justify-between">
