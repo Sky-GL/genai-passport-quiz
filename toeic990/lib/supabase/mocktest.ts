@@ -18,6 +18,26 @@ export async function getMockTestSet(): Promise<MockTestSet> {
   return { questions: questions ?? [], passages: passages ?? [] };
 }
 
+export async function checkMockTestAnswer(
+  questionId: string,
+  selected: Choice
+): Promise<{ isCorrect: boolean; correctChoice: Choice; explanation: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("mock_test_questions")
+    .select("correct_choice, explanation")
+    .eq("id", questionId)
+    .single();
+
+  if (error || !data) throw error ?? new Error("問題が見つかりません");
+
+  return {
+    isCorrect: data.correct_choice === selected,
+    correctChoice: data.correct_choice as Choice,
+    explanation: data.explanation,
+  };
+}
+
 export async function getCorrectAnswers(
   questionIds: string[]
 ): Promise<Map<string, { correctChoice: Choice; explanation: string; part: string }>> {

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCorrectAnswers } from "@/lib/supabase/mocktest";
+import { checkMockTestAnswer, getCorrectAnswers } from "@/lib/supabase/mocktest";
 import { recordStudyActivity } from "@/lib/supabase/gamification";
 import type { Choice, MockTestResult, Part } from "@/types/mocktest";
 
@@ -10,6 +10,11 @@ const MAX_SCORE = 990;
 const MIN_SCORE = 5;
 
 export type SubmittedAnswer = { questionId: string; selected: Choice | null };
+
+// 演習モード用: 選択直後に正誤・解説を返す(採点・XP付与は最終submitMockTestでまとめて行う)
+export async function checkMockTestAnswerAction(questionId: string, selected: Choice) {
+  return checkMockTestAnswer(questionId, selected);
+}
 
 export async function submitMockTest(answers: SubmittedAnswer[]): Promise<MockTestResult> {
   const answerMap = new Map(answers.map((a) => [a.questionId, a.selected]));
