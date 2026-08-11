@@ -10,7 +10,7 @@ import { DEFAULT_DAILY_GOAL } from "@/types";
 
 const MENU_ITEMS = [
   { key: "vocab", label: "単語SRS", href: "/vocab", active: true },
-  { key: "mock-test", label: "模試", href: "/mock-test", active: false },
+  { key: "mock-test", label: "模試", href: "/mock-test", active: true },
   { key: "listening", label: "リスニング", href: "/listening", active: false },
   { key: "analytics", label: "弱点分析", href: "/analytics", active: false },
 ] as const;
@@ -89,7 +89,9 @@ export default async function DashboardPage() {
                   <div className={`h-[34px] w-[34px] rounded-[9px] ${item.active ? "bg-primary-soft" : "bg-border"}`} />
                   <div className="text-sm font-bold text-ink">{item.label}</div>
                   {item.active ? (
-                    <div className="text-xs text-ink-muted">今日{dueCount}枚の復習</div>
+                    <div className="text-xs text-ink-muted">
+                      {item.key === "vocab" ? `今日${dueCount}枚の復習` : "Part5・6演習"}
+                    </div>
                   ) : (
                     <div className="w-fit rounded-full bg-border px-2 py-0.5 text-[10.5px] font-bold text-ink-muted">
                       準備中
