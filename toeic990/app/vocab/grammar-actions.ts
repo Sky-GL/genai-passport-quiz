@@ -18,7 +18,8 @@ export async function submitGrammarAnswer(
   const xp = isCorrect ? XP_CORRECT : XP_INCORRECT;
   await recordStudyActivity(xp);
 
-  revalidatePath("/vocab");
+  // /vocabはセッション内で出題リストをクライアント側に保持しているため再取得しない
+  // (回答済み除外の出題ロジックと組み合わさるとindexがずれてしまうため)
   revalidatePath("/dashboard");
 
   return { isCorrect, correctChoice, explanation, xp };
