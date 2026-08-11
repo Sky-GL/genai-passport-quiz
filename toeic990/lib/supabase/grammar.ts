@@ -52,19 +52,15 @@ export async function checkGrammarAnswer(
 }
 
 export async function recordGrammarAnswer(
+  userId: string,
   questionId: string,
   selected: Choice,
   isCorrect: boolean
 ) {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("未ログインです");
-
   const { error } = await supabase.from("grammar_answers").upsert(
     {
-      user_id: user.id,
+      user_id: userId,
       question_id: questionId,
       selected_choice: selected,
       is_correct: isCorrect,
