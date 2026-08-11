@@ -11,14 +11,17 @@ type Props = {
 };
 
 export default function GrammarSession({ questions }: Props) {
-  const total = questions.length;
+  // セッション開始時点の出題リストをローカルに固定する
+  // (親のquestions propが再取得で変化しても、進行中のindexとズレないようにするため)
+  const [sessionQuestions] = useState(questions);
+  const total = sessionQuestions.length;
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<Choice | null>(null);
   const [result, setResult] = useState<GrammarAnswerResult | null>(null);
   const [isPending, startTransition] = useTransition();
   const [stats, setStats] = useState({ answered: 0, correct: 0, xp: 0 });
 
-  const current = questions[index];
+  const current = sessionQuestions[index];
 
   const handleSelect = (choice: Choice) => {
     if (result || isPending) return;
