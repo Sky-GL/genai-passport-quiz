@@ -15,7 +15,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="mt-1 h-[46px] rounded-[10px] bg-primary font-bold text-sm text-white transition hover:bg-primary-dark disabled:opacity-50"
+      className="mt-2 h-[46px] rounded-[10px] bg-primary font-bold text-sm text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark active:scale-[0.96] disabled:opacity-50 disabled:hover:scale-100"
     >
       {pending ? "処理中..." : "登録する"}
     </button>
@@ -74,7 +74,7 @@ export default function SignupCard() {
         className="flex flex-col gap-3.5"
       >
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-xs font-medium text-ink-muted">
+          <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink-faint">
             メールアドレス
           </label>
           <input
@@ -82,11 +82,11 @@ export default function SignupCard() {
             name="email"
             type="email"
             required
-            className="h-11 rounded-[10px] border border-border bg-page px-3.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary-soft"
+            className="h-11 rounded-[10px] border border-border/50 bg-page px-3.5 text-sm text-ink transition-all duration-200 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary-soft"
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-xs font-medium text-ink-muted">
+          <label htmlFor="password" className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink-faint">
             パスワード
           </label>
           <input
@@ -95,14 +95,14 @@ export default function SignupCard() {
             type="password"
             required
             minLength={6}
-            className="h-11 rounded-[10px] border border-border bg-page px-3.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary-soft"
+            className="h-11 rounded-[10px] border border-border/50 bg-page px-3.5 text-sm text-ink transition-all duration-200 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary-soft"
           />
         </div>
 
         {state.error && (
           <div
             role="alert"
-            className="flex flex-col gap-2 rounded-[10px] border border-border-strong bg-danger-soft px-3.5 py-2.5"
+            className="flex flex-col gap-2 rounded-[10px] bg-danger-soft px-3.5 py-2.5"
           >
             <p className="text-[12.5px] font-medium leading-normal text-danger-text">
               {state.error}

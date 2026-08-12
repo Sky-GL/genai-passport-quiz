@@ -72,19 +72,19 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
   if (phase === "select") {
     return (
-      <div className="flex w-full max-w-[420px] flex-col gap-5 rounded-xl2 border border-border bg-surface p-[26px] shadow-card">
+      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-xl2 bg-surface p-7 shadow-card">
         <div className="flex flex-col gap-3">
           {(["practice", "timed"] as Mode[]).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setMode(m)}
-              className={`flex items-center gap-3 rounded-[11px] border-[1.5px] px-4 py-3 text-left ${
-                mode === m ? "border-primary bg-primary-soft" : "border-border"
+              className={`flex items-center gap-3 rounded-[11px] border px-4 py-3 text-left transition-all duration-300 ease-spring ${
+                mode === m ? "border-primary bg-primary-soft" : "border-border/50 hover:border-primary/30"
               }`}
             >
               <span
-                className={`h-4 w-4 shrink-0 rounded-full border-2 ${
+                className={`h-4 w-4 shrink-0 rounded-full border-2 transition-all duration-300 ${
                   mode === m ? "border-primary bg-primary" : "border-border"
                 }`}
               />
@@ -108,7 +108,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
         <button
           type="button"
           onClick={startSession}
-          className="h-[46px] rounded-[10px] bg-primary text-sm font-bold text-white"
+          className="h-[46px] rounded-[10px] bg-primary text-sm font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
         >
           演習を開始する
         </button>
@@ -123,7 +123,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
     return (
       <div className="flex w-full flex-col items-center gap-4">
-        <div className="flex w-full max-w-[560px] items-center justify-between rounded-xl2 bg-navy px-5 py-3 text-white">
+        <div className="flex w-full max-w-[560px] items-center justify-between rounded-xl2 bg-navy px-5 py-3.5 text-white">
           <span className="font-heading text-sm font-bold">
             {current.part === "part5" ? "Part 5" : "Part 6"} ・ Q{index + 1}/{questions.length}
           </span>
@@ -147,7 +147,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
             type="button"
             disabled={index === 0}
             onClick={() => setIndex((i) => i - 1)}
-            className="h-[42px] rounded-[10px] border border-border px-5 text-[13px] font-bold text-ink disabled:opacity-40"
+            className="h-[42px] rounded-[10px] px-5 text-[13px] font-bold text-ink shadow-flat transition-all duration-300 ease-spring hover:scale-[0.98] disabled:opacity-40 disabled:hover:scale-100"
           >
             前へ
           </button>
@@ -156,7 +156,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
               type="button"
               disabled={isPending}
               onClick={handleSubmit}
-              className="h-[42px] rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white disabled:opacity-50"
+              className="h-[42px] rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark disabled:opacity-50 disabled:hover:scale-100"
             >
               {isPending ? "採点中..." : "採点する"}
             </button>
@@ -164,7 +164,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
             <button
               type="button"
               onClick={() => setIndex((i) => i + 1)}
-              className="h-[42px] rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white"
+              className="h-[42px] rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
             >
               次へ
             </button>
@@ -176,9 +176,11 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
   if (phase === "results" && result) {
     return (
-      <div className="flex w-full max-w-[420px] flex-col gap-5 rounded-xl2 border border-border bg-surface p-[26px] shadow-card">
+      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-xl2 bg-surface p-7 shadow-card">
         <div className="flex flex-col items-center gap-1 text-center">
-          <span className="text-xs text-ink-muted">目安スコア</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-faint">
+            目安スコア
+          </span>
           <span className="font-heading text-5xl font-bold text-primary">
             {result.overallScoreEstimate}
           </span>
@@ -198,7 +200,10 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
                   <span>{pct}%</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-primary-soft">
-                  <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ease-spring ${barColor}`}
+                    style={{ width: `${pct}%` }}
+                  />
                 </div>
               </div>
             );
@@ -207,7 +212,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
         <Link
           href="/dashboard"
-          className="h-[42px] rounded-[10px] bg-primary text-center text-[13px] font-bold leading-[42px] text-white no-underline"
+          className="h-[42px] rounded-[10px] bg-primary text-center text-[13px] font-bold leading-[42px] text-white no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>

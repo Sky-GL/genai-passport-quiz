@@ -8,7 +8,7 @@ type Props = {
 
 export default function DashboardHeader({ email, streak, level }: Props) {
   return (
-    <header className="flex items-center justify-between bg-navy px-7 py-4">
+    <header className="flex items-center justify-between bg-navy px-8 py-5">
       <div className="flex items-center gap-5">
         <span className="font-heading text-[17px] font-bold text-white">TOEIC 990</span>
         {streak > 0 && (
@@ -30,7 +30,7 @@ export default function DashboardHeader({ email, streak, level }: Props) {
         <form action={signOut}>
           <button
             type="submit"
-            className="h-[34px] rounded-lg border border-[oklch(0.4_0.02_265)] px-3.5 text-[12.5px] font-medium text-[oklch(0.85_0.01_265)] transition hover:bg-white/5"
+            className="h-[34px] rounded-lg px-3.5 text-[12.5px] font-medium text-[oklch(0.85_0.01_265)] transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-white/8"
           >
             ログアウト
           </button>

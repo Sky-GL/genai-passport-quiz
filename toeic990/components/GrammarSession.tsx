@@ -54,7 +54,7 @@ export default function GrammarSession({ questions }: Props) {
         </p>
         <Link
           href="/dashboard"
-          className="mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline"
+          className="mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>
@@ -77,7 +77,7 @@ export default function GrammarSession({ questions }: Props) {
         <button
           type="button"
           onClick={handleNext}
-          className="h-[42px] w-full max-w-[420px] self-end rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white"
+          className="h-[42px] w-full max-w-[420px] self-end rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
         >
           次の問題へ
         </button>

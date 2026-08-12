@@ -76,7 +76,7 @@ export default function VocabSession({ cards }: Props) {
         )}
         <Link
           href="/dashboard"
-          className="mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline"
+          className="mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>
@@ -117,7 +117,7 @@ export default function VocabSession({ cards }: Props) {
               type="button"
               disabled={isPending}
               onClick={() => handleGrade(grade)}
-              className={`h-[52px] rounded-[11px] text-xs font-bold disabled:opacity-50 ${className}`}
+              className={`h-[52px] rounded-[11px] text-xs font-bold transition-all duration-300 ease-spring hover:scale-[0.97] disabled:opacity-50 disabled:hover:scale-100 ${className}`}
             >
               {label}
             </button>
