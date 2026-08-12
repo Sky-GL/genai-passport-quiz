@@ -16,12 +16,18 @@ export function rowToCard(row: VocabCardRow): Card {
   };
 }
 
+// ts-fsrsのState: 2 = Review。安定度(記憶保持日数の目安)がこの日数を超えたReview状態のカードは
+// 十分習熟したとみなし、以後の復習対象から除外する
+const MASTERED_STATE = 2;
+const MASTERED_STABILITY_DAYS = 30;
+
 export async function getDueVocabCards(limit = 30, category?: string): Promise<VocabCardRow[]> {
   const supabase = await createSupabaseServerClient();
   let query = supabase
     .from("vocab_cards")
     .select("*")
     .lte("due", new Date().toISOString())
+    .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`)
     .order("due", { ascending: true })
     .limit(limit);
 
@@ -30,6 +36,23 @@ export async function getDueVocabCards(limit = 30, category?: string): Promise<V
   }
 
   const { data, error } = await query;
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+// 苦手復習: lapses(失敗回数)が多い順、次いでdifficultyが高い順に出題する。
+// due日時は問わず、習熟済み(mastered)のカードのみ除外する
+export async function getWeakVocabCards(limit = 20): Promise<VocabCardRow[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("vocab_cards")
+    .select("*")
+    .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`)
+    .gt("lapses", 0)
+    .order("lapses", { ascending: false })
+    .order("difficulty", { ascending: false })
+    .limit(limit);
 
   if (error) throw error;
   return data ?? [];
@@ -52,7 +75,8 @@ export async function getDueVocabCardCount(): Promise<number> {
   const { count, error } = await supabase
     .from("vocab_cards")
     .select("id", { count: "exact", head: true })
-    .lte("due", new Date().toISOString());
+    .lte("due", new Date().toISOString())
+    .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`);
 
   if (error) throw error;
   return count ?? 0;

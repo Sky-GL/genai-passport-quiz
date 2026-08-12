@@ -16,4 +16,6 @@ export type VocabCardRow = {
   category: string | null;
   related_words: string | null;
   collocation: string | null;
+  etymology: string | null;
+  word_family: string | null;
 };
