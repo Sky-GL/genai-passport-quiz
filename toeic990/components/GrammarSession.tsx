@@ -47,14 +47,16 @@ export default function GrammarSession({ questions }: Props) {
     const accuracy = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
 
     return (
-      <div className="flex min-h-[280px] w-full max-w-[420px] flex-col items-center justify-center gap-3.5 rounded-xl2 bg-gradient-to-br from-primary to-navy px-6 py-8 text-center text-white">
-        <p className="font-heading text-xl font-bold">文法問題は完了です</p>
-        <p className="text-[13px] opacity-80">
+      <div className="relative flex min-h-[280px] w-full max-w-[420px] flex-col items-center justify-center gap-3.5 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-white/10 blur-3xl" />
+        <p className="relative font-heading text-xl font-bold">文法問題は完了です</p>
+        <p className="relative text-[13px] opacity-80">
           {stats.answered}問 回答 ・ 正答率 {accuracy}% ・ +{stats.xp} XP
         </p>
         <Link
           href="/dashboard"
-          className="mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+          className="relative mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>

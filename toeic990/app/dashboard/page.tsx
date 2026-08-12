@@ -15,6 +15,31 @@ const MENU_ITEMS = [
   { key: "analytics", label: "弱点分析", href: "/analytics", active: false },
 ] as const;
 
+const MENU_ICON_PATHS: Record<(typeof MENU_ITEMS)[number]["key"], string> = {
+  vocab: "M4 5.5C4 4.67 4.67 4 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13ZM20 5.5C20 4.67 19.33 4 18.5 4H12v16h6.5a1.5 1.5 0 0 0 1.5-1.5v-13Z",
+  "mock-test": "M6 3.5h9l3 3v14H6v-17ZM15 3.5V7h3.5M9 12h6M9 15.5h6M9 8.5h2.5",
+  listening: "M4 13a8 8 0 0 1 16 0v5a2 2 0 0 1-2 2h-1v-6h3M4 13v6h1a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H4Z",
+  analytics: "M5 20V10M12 20V4M19 20v-7",
+};
+
+function MenuIcon({ menuKey, active }: { menuKey: (typeof MENU_ITEMS)[number]["key"]; active: boolean }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={active ? "text-primary" : "text-ink-faint"}
+    >
+      <path d={MENU_ICON_PATHS[menuKey]} />
+    </svg>
+  );
+}
+
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
   const {
@@ -46,15 +71,17 @@ export default async function DashboardPage() {
       <DashboardHeader email={user.email ?? ""} streak={userStats.current_streak} level={level} />
       <main className="mx-auto flex max-w-4xl flex-col gap-9 px-8 py-12">
         <div className="flex flex-col gap-5 sm:flex-row">
-          <div className="flex flex-1 flex-col gap-4 rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-6 text-white shadow-card">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-80">
+          <div className="relative flex flex-1 flex-col gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy p-7 text-white shadow-hero">
+            <div className="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+            <div className="relative text-[10px] font-bold uppercase tracking-[0.18em] opacity-80">
               今日の学習目標
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-heading text-4xl font-bold">{progressCount}</span>
+            <div className="relative flex items-baseline gap-2">
+              <span className="font-heading text-5xl font-bold">{progressCount}</span>
               <span className="text-[15px] font-medium opacity-85">/ {goal}枚</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-white/20">
+            <div className="relative h-1.5 overflow-hidden rounded-full bg-white/20">
               <div
                 className="h-full rounded-full bg-white transition-all duration-500 ease-spring"
                 style={{ width: `${progressPct}%` }}
@@ -63,16 +90,16 @@ export default async function DashboardPage() {
             {remaining > 0 ? (
               <Link
                 href="/vocab"
-                className="mt-1 h-[38px] w-fit rounded-[9px] bg-white px-4 text-[13px] font-bold leading-[38px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+                className="relative mt-1 h-[38px] w-fit rounded-[9px] bg-white px-4 text-[13px] font-bold leading-[38px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
               >
                 残り{remaining}枚を復習する
               </Link>
             ) : goalAchieved ? (
-              <p className="mt-1 text-[13px] font-medium opacity-85">
+              <p className="relative mt-1 text-[13px] font-medium opacity-85">
                 今日の目標を達成しました 🎉
               </p>
             ) : (
-              <p className="mt-1 text-[13px] font-medium opacity-85">
+              <p className="relative mt-1 text-[13px] font-medium opacity-85">
                 本日復習できるカードがありません
               </p>
             )}
@@ -89,13 +116,19 @@ export default async function DashboardPage() {
             {MENU_ITEMS.map((item) => {
               const content = (
                 <div
-                  className={`flex flex-col gap-2.5 rounded-xl bg-surface p-[18px] transition-all duration-300 ease-spring ${
+                  className={`flex flex-col gap-2.5 rounded-xl2 bg-surface p-5 transition-all duration-300 ease-spring ${
                     item.active
-                      ? "shadow-flat hover:-translate-y-0.5 hover:shadow-card"
+                      ? "shadow-flat hover:-translate-y-1 hover:shadow-hover"
                       : "opacity-50"
                   }`}
                 >
-                  <div className={`h-[34px] w-[34px] rounded-[9px] ${item.active ? "bg-primary-soft" : "bg-border/60"}`} />
+                  <div
+                    className={`flex h-[38px] w-[38px] items-center justify-center rounded-[10px] ${
+                      item.active ? "bg-primary-soft" : "bg-border/60"
+                    }`}
+                  >
+                    <MenuIcon menuKey={item.key} active={item.active} />
+                  </div>
                   <div className="text-sm font-bold text-ink">{item.label}</div>
                   {item.active ? (
                     <div className="text-xs text-ink-muted">
