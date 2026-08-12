@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getDueVocabCards, getVocabCategories } from "@/lib/supabase/vocab";
-import { getUnansweredGrammarQuestions } from "@/lib/supabase/grammar";
+import { getDueVocabCards, getVocabCategories, getWeakVocabCards } from "@/lib/supabase/vocab";
+import { getIncorrectGrammarQuestions, getUnansweredGrammarQuestions } from "@/lib/supabase/grammar";
 import VocabSession from "@/components/VocabSession";
 import GrammarSession from "@/components/GrammarSession";
 import { DEFAULT_DAILY_GOAL } from "@/types";
 
 type Props = {
-  searchParams: { category?: string; mode?: string };
+  searchParams: { category?: string; mode?: string; weak?: string };
 };
 
 const GRAMMAR_BATCH_SIZE = 15;
@@ -25,6 +25,8 @@ export default async function VocabPage({ searchParams }: Props) {
 
   const mode = searchParams.mode === "grammar" ? "grammar" : "vocab";
   const category = searchParams.category;
+  const weak = searchParams.weak === "1";
+  const modeQuery = mode === "grammar" ? "?mode=grammar" : "";
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-8">
@@ -54,24 +56,43 @@ export default async function VocabPage({ searchParams }: Props) {
         </Link>
       </div>
 
+      <div className="flex w-full max-w-[420px] gap-1.5">
+        <Link
+          href={modeQuery || "/vocab"}
+          className={`rounded-full px-3 py-1 text-xs font-bold no-underline ${
+            !weak ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
+          }`}
+        >
+          通常
+        </Link>
+        <Link
+          href={`/vocab${modeQuery ? `${modeQuery}&weak=1` : "?weak=1"}`}
+          className={`rounded-full px-3 py-1 text-xs font-bold no-underline ${
+            weak ? "bg-danger text-white" : "bg-danger-soft text-danger-text"
+          }`}
+        >
+          苦手復習
+        </Link>
+      </div>
+
       {mode === "vocab" ? (
-        <VocabModeContent userId={user.id} category={category} />
+        <VocabModeContent category={category} weak={weak} />
       ) : (
-        <GrammarModeContent />
+        <GrammarModeContent weak={weak} />
       )}
     </main>
   );
 }
 
-async function VocabModeContent({ category }: { userId: string; category?: string }) {
+async function VocabModeContent({ category, weak }: { category?: string; weak: boolean }) {
   const [cards, categories] = await Promise.all([
-    getDueVocabCards(DEFAULT_DAILY_GOAL, category),
+    weak ? getWeakVocabCards(DEFAULT_DAILY_GOAL) : getDueVocabCards(DEFAULT_DAILY_GOAL, category),
     getVocabCategories(),
   ]);
 
   return (
     <>
-      {categories.length > 0 && (
+      {!weak && categories.length > 0 && (
         <div className="flex w-full max-w-[340px] flex-wrap gap-1.5">
           <Link
             href="/vocab"
@@ -97,25 +118,29 @@ async function VocabModeContent({ category }: { userId: string; category?: strin
 
       {cards.length === 0 ? (
         <p className="py-16 text-center text-ink-muted">
-          本日復習予定のカードはありません。
+          {weak ? "苦手な単語はまだありません。" : "本日復習予定のカードはありません。"}
         </p>
       ) : (
-        <VocabSession key={category ?? "all"} cards={cards} />
+        <VocabSession key={weak ? "weak" : category ?? "all"} cards={cards} />
       )}
     </>
   );
 }
 
-async function GrammarModeContent() {
-  const questions = await getUnansweredGrammarQuestions(GRAMMAR_BATCH_SIZE);
+async function GrammarModeContent({ weak }: { weak: boolean }) {
+  const questions = weak
+    ? await getIncorrectGrammarQuestions(GRAMMAR_BATCH_SIZE)
+    : await getUnansweredGrammarQuestions(GRAMMAR_BATCH_SIZE);
 
   if (questions.length === 0) {
     return (
       <p className="py-16 text-center text-ink-muted">
-        すべての文法問題に回答済みです。お疲れさまでした。
+        {weak
+          ? "誤答した文法問題はまだありません。"
+          : "すべての文法問題に回答済みです。お疲れさまでした。"}
       </p>
     );
   }
 
-  return <GrammarSession questions={questions} />;
+  return <GrammarSession key={weak ? "weak" : "all"} questions={questions} />;
 }

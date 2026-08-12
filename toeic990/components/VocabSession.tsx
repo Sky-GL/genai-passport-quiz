@@ -103,6 +103,8 @@ export default function VocabSession({ cards }: Props) {
         category={current.category}
         relatedWords={current.related_words}
         collocation={current.collocation}
+        etymology={current.etymology}
+        wordFamily={current.word_family}
         flipped={flipped}
         onFlip={() => setFlipped((f) => !f)}
       />

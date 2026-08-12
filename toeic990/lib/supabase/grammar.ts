@@ -31,6 +31,37 @@ export async function getUnansweredGrammarQuestions(
   return data ?? [];
 }
 
+// 苦手復習: 過去に誤答した問題のみを再出題する
+export async function getIncorrectGrammarQuestions(
+  limit = 15
+): Promise<GrammarQuestionPublic[]> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data: incorrect, error: incorrectError } = await supabase
+    .from("grammar_answers")
+    .select("question_id")
+    .eq("user_id", user.id)
+    .eq("is_correct", false);
+
+  if (incorrectError) throw incorrectError;
+  const incorrectIds = (incorrect ?? []).map((row) => row.question_id);
+  if (incorrectIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("grammar_questions")
+    .select(PUBLIC_COLUMNS)
+    .in("id", incorrectIds)
+    .limit(limit);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function checkGrammarAnswer(
   questionId: string,
   selected: Choice

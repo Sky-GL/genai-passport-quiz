@@ -6,6 +6,8 @@ type Props = {
   category: string | null;
   relatedWords: string | null;
   collocation: string | null;
+  etymology: string | null;
+  wordFamily: string | null;
   flipped: boolean;
   onFlip: () => void;
 };
@@ -21,12 +23,17 @@ export default function VocabCard({
   category,
   relatedWords,
   collocation,
+  etymology,
+  wordFamily,
   flipped,
   onFlip,
 }: Props) {
   const { meaning, example } = splitBack(back);
   const relatedList = relatedWords
     ? relatedWords.split(",").map((w) => w.trim()).filter(Boolean)
+    : [];
+  const familyList = wordFamily
+    ? wordFamily.split(",").map((w) => w.trim()).filter(Boolean)
     : [];
 
   return (
@@ -66,6 +73,27 @@ export default function VocabCard({
             <div className="rounded-lg bg-page px-3 py-2 text-[12px] leading-relaxed text-ink-muted">
               <span className="font-bold text-ink">よく使う形　</span>
               {collocation}
+            </div>
+          )}
+          {etymology && (
+            <div className="rounded-lg bg-primary-soft px-3 py-2 text-[12px] leading-relaxed text-primary-dark">
+              <span className="font-bold">語源　</span>
+              {etymology}
+            </div>
+          )}
+          {familyList.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] font-bold text-ink-muted">同語源の派生語</span>
+              <div className="flex flex-wrap gap-1.5">
+                {familyList.map((word) => (
+                  <span
+                    key={word}
+                    className="rounded-full border border-primary-soft px-2.5 py-1 text-[11.5px] font-medium text-primary-dark"
+                  >
+                    {word}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>
