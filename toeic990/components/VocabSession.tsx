@@ -107,6 +107,7 @@ export default function VocabSession({ cards }: Props) {
         collocation={current.collocation}
         etymology={current.etymology}
         wordFamily={current.word_family}
+        toeicLevel={current.toeic_level}
         flipped={flipped}
         onFlip={() => setFlipped((f) => !f)}
       />

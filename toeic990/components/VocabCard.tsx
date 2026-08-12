@@ -8,9 +8,35 @@ type Props = {
   collocation: string | null;
   etymology: string | null;
   wordFamily: string | null;
+  toeicLevel: number | null;
   flipped: boolean;
   onFlip: () => void;
 };
+
+function DifficultyStars({ level }: { level: number }) {
+  return (
+    <span className="flex items-center gap-0.5" title={`TOEIC難易度 ${level}/5`}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <svg
+          key={i}
+          width="11"
+          height="11"
+          viewBox="0 0 24 24"
+          fill={i < level ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="1.5"
+          className={i < level ? "text-accent" : "text-border"}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 3.5l2.6 5.34 5.9.86-4.27 4.16 1.01 5.88L12 17.02l-5.24 2.72 1.01-5.88-4.27-4.16 5.9-.86L12 3.5Z"
+          />
+        </svg>
+      ))}
+    </span>
+  );
+}
 
 function splitBack(back: string): { meaning: string; example: string } {
   const [meaning, ...rest] = back.split("　例:");
@@ -25,6 +51,7 @@ export default function VocabCard({
   collocation,
   etymology,
   wordFamily,
+  toeicLevel,
   flipped,
   onFlip,
 }: Props) {
@@ -47,6 +74,7 @@ export default function VocabCard({
           {category}
         </span>
       )}
+      {toeicLevel && <span className="absolute right-4 top-4"><DifficultyStars level={toeicLevel} /></span>}
 
       {flipped ? (
         <div className="flex w-full flex-col gap-3 pt-4 text-left">
