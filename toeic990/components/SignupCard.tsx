@@ -60,8 +60,7 @@ export default function SignupCard() {
   return (
     <>
       <div className="flex flex-col items-center gap-1.5 text-center">
-        <div className="h-10 w-10 rounded-[11px] bg-primary" />
-        <h1 className="mt-1.5 font-heading text-xl font-bold text-ink">TOEIC 990</h1>
+        <h1 className="font-heading text-xl font-bold text-ink">TOEIC 990</h1>
         <p className="text-[13px] text-ink-muted">新規登録して学習を始めましょう。</p>
       </div>
 

@@ -10,7 +10,7 @@ export default function WeeklyXpChart({ days, total }: Props) {
   const todayIndex = days.length - 1;
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-2xl bg-surface p-6 shadow-flat sm:w-[230px]">
+    <div className="flex w-full flex-col gap-3 rounded-xl2 bg-surface p-6 shadow-flat sm:w-[230px]">
       <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-faint">週間XP</div>
       <div className="font-heading text-3xl font-bold text-ink">{total.toLocaleString()}</div>
       <div className="mt-1.5 flex h-11 items-end gap-1.5">

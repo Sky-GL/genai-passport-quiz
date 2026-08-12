@@ -176,15 +176,16 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
   if (phase === "results" && result) {
     return (
-      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-xl2 bg-surface p-7 shadow-card">
-        <div className="flex flex-col items-center gap-1 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-faint">
+      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-xl3 bg-surface p-7 shadow-hero">
+        <div className="relative flex flex-col items-center gap-1 overflow-hidden rounded-xl2 bg-primary-soft py-6 text-center">
+          <div className="pointer-events-none absolute -top-10 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
+          <span className="relative text-[10px] font-bold uppercase tracking-[0.18em] text-primary-dark/70">
             目安スコア
           </span>
-          <span className="font-heading text-5xl font-bold text-primary">
+          <span className="relative font-heading text-6xl font-bold text-primary">
             {result.overallScoreEstimate}
           </span>
-          <span className="text-[13px] text-ink-muted">
+          <span className="relative text-[13px] text-primary-dark/80">
             {result.correctCount} / {result.totalCount}問正解 ・ +{result.xp} XP
           </span>
         </div>

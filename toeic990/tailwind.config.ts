@@ -47,11 +47,18 @@ const config: Config = {
       },
       borderRadius: {
         xl2: "20px",
+        xl3: "28px",
       },
       boxShadow: {
         card: "0 2px 8px oklch(0.5 0.09 265 / 0.06), 0 24px 56px -12px oklch(0.5 0.09 265 / 0.22)",
         hover: "0 4px 12px oklch(0.5 0.09 265 / 0.08), 0 32px 64px -16px oklch(0.5 0.09 265 / 0.28)",
         flat: "0 1px 2px oklch(0.5 0.09 265 / 0.05)",
+        glow: "0 0 0 1px oklch(1 0 0 / 0.06), 0 12px 32px -6px oklch(0.56 0.19 265 / 0.45)",
+        hero: "0 2px 12px oklch(0.14 0.02 265 / 0.15), 0 40px 90px -20px oklch(0.56 0.19 265 / 0.45)",
+      },
+      backgroundImage: {
+        aurora:
+          "radial-gradient(60% 50% at 15% 0%, oklch(0.6 0.16 265 / 0.35), transparent), radial-gradient(50% 45% at 90% 15%, oklch(0.68 0.19 35 / 0.22), transparent), radial-gradient(60% 50% at 50% 100%, oklch(0.56 0.19 265 / 0.25), transparent)",
       },
       transitionTimingFunction: {
         spring: "cubic-bezier(0.32,0.72,0,1)",
