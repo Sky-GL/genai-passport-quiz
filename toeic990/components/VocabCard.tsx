@@ -40,7 +40,7 @@ export default function VocabCard({
     <button
       type="button"
       onClick={onFlip}
-      className="relative flex min-h-[280px] w-full max-w-[340px] flex-col items-center justify-center gap-2.5 rounded-xl2 border border-border bg-surface p-6 text-center shadow-card transition hover:border-primary-soft"
+      className="relative flex min-h-[280px] w-full max-w-[340px] flex-col items-center justify-center gap-2.5 rounded-xl2 bg-surface p-7 text-center shadow-card transition-all duration-300 ease-spring hover:-translate-y-0.5 hover:shadow-hover"
     >
       {category && (
         <span className="absolute left-4 top-4 rounded-full bg-primary-soft px-2.5 py-0.5 text-[10.5px] font-bold text-primary-dark">

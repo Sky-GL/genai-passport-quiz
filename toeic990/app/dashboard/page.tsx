@@ -44,21 +44,26 @@ export default async function DashboardPage() {
   return (
     <div>
       <DashboardHeader email={user.email ?? ""} streak={userStats.current_streak} level={level} />
-      <main className="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-8">
+      <main className="mx-auto flex max-w-4xl flex-col gap-9 px-8 py-12">
         <div className="flex flex-col gap-5 sm:flex-row">
-          <div className="flex flex-1 flex-col gap-3.5 rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-[22px] text-white">
-            <div className="text-[12.5px] font-medium opacity-85">今日の学習目標</div>
+          <div className="flex flex-1 flex-col gap-4 rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-6 text-white shadow-card">
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-80">
+              今日の学習目標
+            </div>
             <div className="flex items-baseline gap-2">
               <span className="font-heading text-4xl font-bold">{progressCount}</span>
               <span className="text-[15px] font-medium opacity-85">/ {goal}枚</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/25">
-              <div className="h-full rounded-full bg-white" style={{ width: `${progressPct}%` }} />
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/20">
+              <div
+                className="h-full rounded-full bg-white transition-all duration-500 ease-spring"
+                style={{ width: `${progressPct}%` }}
+              />
             </div>
             {remaining > 0 ? (
               <Link
                 href="/vocab"
-                className="mt-1 h-[38px] w-fit rounded-[9px] bg-white px-4 text-[13px] font-bold leading-[38px] text-primary-dark no-underline"
+                className="mt-1 h-[38px] w-fit rounded-[9px] bg-white px-4 text-[13px] font-bold leading-[38px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
               >
                 残り{remaining}枚を復習する
               </Link>
@@ -76,24 +81,28 @@ export default async function DashboardPage() {
           <WeeklyXpChart days={weeklyActivity} total={weeklyXpTotal} />
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="text-sm font-bold text-ink">学習メニュー</div>
-          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+        <div className="flex flex-col gap-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-faint">
+            学習メニュー
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {MENU_ITEMS.map((item) => {
               const content = (
                 <div
-                  className={`flex flex-col gap-2.5 rounded-xl border border-border bg-page p-[18px] ${
-                    item.active ? "" : "opacity-55"
+                  className={`flex flex-col gap-2.5 rounded-xl bg-surface p-[18px] transition-all duration-300 ease-spring ${
+                    item.active
+                      ? "shadow-flat hover:-translate-y-0.5 hover:shadow-card"
+                      : "opacity-50"
                   }`}
                 >
-                  <div className={`h-[34px] w-[34px] rounded-[9px] ${item.active ? "bg-primary-soft" : "bg-border"}`} />
+                  <div className={`h-[34px] w-[34px] rounded-[9px] ${item.active ? "bg-primary-soft" : "bg-border/60"}`} />
                   <div className="text-sm font-bold text-ink">{item.label}</div>
                   {item.active ? (
                     <div className="text-xs text-ink-muted">
                       {item.key === "vocab" ? `今日${dueCount}枚の復習` : "Part5・6演習"}
                     </div>
                   ) : (
-                    <div className="w-fit rounded-full bg-border px-2 py-0.5 text-[10.5px] font-bold text-ink-muted">
+                    <div className="w-fit rounded-full bg-border/60 px-2 py-0.5 text-[10.5px] font-bold text-ink-muted">
                       準備中
                     </div>
                   )}

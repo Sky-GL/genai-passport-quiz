@@ -17,7 +17,7 @@ export default async function MockTestPage() {
   const { questions, passages } = await getMockTestSet();
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-8">
+    <main className="mx-auto flex max-w-3xl flex-col items-center gap-7 px-8 py-12">
       <div className="flex w-full max-w-[560px] items-center justify-between">
         <h1 className="font-heading text-lg font-bold text-ink">模試形式演習</h1>
         <Link href="/dashboard" className="text-[13px] text-ink-muted no-underline">

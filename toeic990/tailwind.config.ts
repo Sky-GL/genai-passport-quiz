@@ -49,7 +49,12 @@ const config: Config = {
         xl2: "20px",
       },
       boxShadow: {
-        card: "0 1px 3px rgba(30,20,60,0.06), 0 12px 32px oklch(0.5 0.09 265 / 0.16)",
+        card: "0 2px 8px oklch(0.5 0.09 265 / 0.06), 0 24px 56px -12px oklch(0.5 0.09 265 / 0.22)",
+        hover: "0 4px 12px oklch(0.5 0.09 265 / 0.08), 0 32px 64px -16px oklch(0.5 0.09 265 / 0.28)",
+        flat: "0 1px 2px oklch(0.5 0.09 265 / 0.05)",
+      },
+      transitionTimingFunction: {
+        spring: "cubic-bezier(0.32,0.72,0,1)",
       },
     },
   },
