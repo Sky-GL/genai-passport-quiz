@@ -1,28 +1,33 @@
 # flight-search-cli
 
-Duffel APIを使った汎用フライト検索CLIツール。
+RapidAPIの「Sky Scrapper」API（Skyscannerの非公式ラッパー）を使った汎用フライト検索CLIツール。
 
 国内線・国際線、単純往復、オープンジョーを含むマルチシティ（2〜4区間程度）の検索に対応する。
-検索（offer_requests作成）のみを行い、予約・発券は行わない。予約はGoogle Flightsか航空会社サイトで別途行うこと。
+Sky Scrapperは区間ごとの片道検索APIのため、指定した区間を1つずつ独立に検索し、区間ごとに価格順の候補を表示する
+（複数区間をまとめた1枚の合算運賃チケットは出せない点に注意）。
 
 ## セットアップ
 
-1. https://duffel.com/ でアカウントを作成し、ダッシュボードからアクセストークン（test/live）を発行する
-2. 依存ライブラリをインストールする
+1. https://rapidapi.com/ でアカウントを作成する（会社登録は不要）
+2. [Sky Scrapper](https://rapidapi.com/apiheya/api/sky-scrapper) のページで無料プラン（Basic）をSubscribeする
+3. 「Endpoints」タブなどに表示される `X-RapidAPI-Key` をコピーする
+4. 依存ライブラリをインストールする
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. 環境変数を設定する（`.env.example` を参考に）
+5. 環境変数を設定する（`.env.example` を参考に）
 
 ```bash
-export DUFFEL_ACCESS_TOKEN=duffel_test_xxxxx
+export RAPIDAPI_KEY=your-rapidapi-key-here
 ```
+
+無料プランはひと月あたりのリクエスト数に上限があるので注意（1区間の検索でAPIコールを2回消費する：都市名解決1回＋フライト検索1回）。
 
 ## 使い方
 
-`--segments` に `出発地,目的地,日付(YYYY-MM-DD)` の形式で区間をスペース区切りで指定する。出発地・目的地は都市名・空港名・IATAコードのいずれでも指定できる（3文字コード以外は候補検索して選択させる）。
+`--segments` に `出発地,目的地,日付(YYYY-MM-DD)` の形式で区間をスペース区切りで指定する。出発地・目的地は都市名・空港名・IATAコードのいずれでも指定できる（候補が複数あれば番号選択させる）。
 
 単純往復:
 
@@ -48,9 +53,9 @@ python flight_search.py --segments NRT,SIN,2026-11-06 SIN,NRT,2026-11-12 --adult
 python flight_search.py --segments NRT,SIN,2026-11-06 --csv result.csv
 ```
 
-検索結果は価格が安い順に上位5件を表示する（航空会社・便名、出発/到着時刻、概算運賃）。
+各区間について、価格が安い順に上位5件を表示する（航空会社・便名、出発/到着時刻、概算運賃）。
 
 ## 注意事項
 
-- フライト検索（offer_requests作成）自体は無料。実際の予約・発券まで進めない限り課金は発生しない
-- 本ツールは検索・スクリーニング用途のみ
+- 本ツールは検索・スクリーニング用途のみ。実際の予約はGoogle Flightsか航空会社サイトで別途行うこと
+- 区間ごとの独立検索のため、乗り継ぎ割引や複数区間セット運賃は反映されない（各区間を素直に足し合わせた場合の目安として利用する）
