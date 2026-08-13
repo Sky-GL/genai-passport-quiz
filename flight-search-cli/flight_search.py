@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""汎用フライト検索CLI（Amadeus Self-Service Flight Offers Search APIを使用）
+"""汎用フライト検索CLI（Duffel APIを使用）
 
 国内線・国際線、単純往復、オープンジョーを含むマルチシティ検索に対応する。
+検索（offer_requests作成）のみ行い、予約・発券は行わない。
 """
 
 import argparse
@@ -13,38 +14,52 @@ from datetime import datetime
 
 import requests
 
-TEST_BASE_URL = "https://test.api.amadeus.com"
-# 本番環境を使う場合は AMADEUS_BASE_URL=https://api.amadeus.com を設定する
-BASE_URL = os.environ.get("AMADEUS_BASE_URL", TEST_BASE_URL)
+BASE_URL = "https://api.duffel.com"
+DUFFEL_VERSION = "v2"
 
 IATA_CODE_PATTERN = re.compile(r"^[A-Za-z]{3}$")
 
 
-class AmadeusError(Exception):
-    """Amadeus API関連のエラーをまとめて扱うための例外"""
+class DuffelError(Exception):
+    """Duffel API関連のエラーをまとめて扱うための例外"""
 
 
-def get_access_token(api_key, api_secret):
-    """OAuth2 client credentialsでアクセストークンを取得する"""
-    url = f"{BASE_URL}/v1/security/oauth2/token"
-    data = {
-        "grant_type": "client_credentials",
-        "client_id": api_key,
-        "client_secret": api_secret,
+def _headers(token, with_content_type=False):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Duffel-Version": DUFFEL_VERSION,
+        "Accept": "application/json",
     }
+    if with_content_type:
+        headers["Content-Type"] = "application/json"
+    return headers
+
+
+def _extract_error_message(resp):
+    """Duffelのエラーレスポンス（{"errors": [...]}）から人間が読めるメッセージを組み立てる"""
     try:
-        resp = requests.post(url, data=data, timeout=15)
+        errors = resp.json().get("errors", [])
+    except ValueError:
+        return resp.text
+    if not errors:
+        return resp.text
+    return " / ".join(e.get("message", e.get("title", "")) for e in errors)
+
+
+def check_token(token):
+    """トークンの有効性を軽い呼び出しで確認する（残り区間の検索前に早期に失敗させる）"""
+    url = f"{BASE_URL}/places/suggestions"
+    try:
+        resp = requests.get(url, params={"query": "London"}, headers=_headers(token), timeout=15)
     except requests.RequestException as e:
-        raise AmadeusError(f"認証サーバーへの接続に失敗しました: {e}")
+        raise DuffelError(f"Duffel APIへの接続に失敗しました: {e}")
 
     if resp.status_code == 401:
-        raise AmadeusError("認証に失敗しました。APIキー・シークレットを確認してください。")
+        raise DuffelError("認証に失敗しました。DUFFEL_ACCESS_TOKENを確認してください。")
     if resp.status_code == 429:
-        raise AmadeusError("APIのレート制限を超過しました。しばらく待ってから再実行してください。")
+        raise DuffelError("APIのレート制限を超過しました。しばらく待ってから再実行してください。")
     if not resp.ok:
-        raise AmadeusError(f"認証エラー（HTTP {resp.status_code}）: {resp.text}")
-
-    return resp.json()["access_token"]
+        raise DuffelError(f"認証確認に失敗しました（HTTP {resp.status_code}）: {_extract_error_message(resp)}")
 
 
 class LocationResolver:
@@ -67,126 +82,118 @@ class LocationResolver:
         return code
 
     def _search_and_select(self, query):
-        url = f"{BASE_URL}/v1/reference-data/locations"
-        params = {"keyword": query, "subType": "AIRPORT,CITY", "page[limit]": 10}
-        headers = {"Authorization": f"Bearer {self.token}"}
+        url = f"{BASE_URL}/places/suggestions"
+        headers = _headers(self.token)
         try:
-            resp = requests.get(url, params=params, headers=headers, timeout=15)
+            resp = requests.get(url, params={"query": query}, headers=headers, timeout=15)
         except requests.RequestException as e:
-            raise AmadeusError(f"「{query}」の検索中に接続エラーが発生しました: {e}")
+            raise DuffelError(f"「{query}」の検索中に接続エラーが発生しました: {e}")
 
         if resp.status_code == 429:
-            raise AmadeusError("APIのレート制限を超過しました。しばらく待ってから再実行してください。")
+            raise DuffelError("APIのレート制限を超過しました。しばらく待ってから再実行してください。")
         if not resp.ok:
-            raise AmadeusError(f"「{query}」の検索に失敗しました（HTTP {resp.status_code}）: {resp.text}")
+            raise DuffelError(f"「{query}」の検索に失敗しました（HTTP {resp.status_code}）: {_extract_error_message(resp)}")
 
-        results = resp.json().get("data", [])
+        results = [r for r in resp.json().get("data", []) if r.get("iata_code")]
         if not results:
-            raise AmadeusError(f"「{query}」に該当する都市・空港が見つかりませんでした。")
+            raise DuffelError(f"「{query}」に該当する都市・空港が見つかりませんでした。")
 
         if len(results) == 1:
-            return results[0]["iataCode"]
+            return results[0]["iata_code"]
 
         print(f"\n「{query}」に該当する候補が複数見つかりました。番号を選択してください:")
         for i, item in enumerate(results, start=1):
             name = item.get("name", "")
-            address = item.get("address", {})
-            city = address.get("cityName", "")
-            country = address.get("countryName", "")
-            print(f"  [{i}] {item['iataCode']} - {name} ({city}, {country})")
+            place_type = item.get("type", "")
+            city_name = (item.get("city") or {}).get("name", "")
+            country = item.get("iata_country_code", "")
+            label = f"{name} ({place_type}" + (f", {city_name}" if city_name else "") + f", {country})"
+            print(f"  [{i}] {item['iata_code']} - {label}")
 
         while True:
             choice = input(f"番号を入力してください (1-{len(results)}): ").strip()
             if choice.isdigit() and 1 <= int(choice) <= len(results):
-                return results[int(choice) - 1]["iataCode"]
+                return results[int(choice) - 1]["iata_code"]
             print("無効な入力です。もう一度入力してください。")
 
 
 def parse_segments(raw_segments, resolver):
-    """「出発地,目的地,日付」形式の文字列群をAmadeus APIのoriginDestinations形式に変換する"""
-    origin_destinations = []
-    for i, raw in enumerate(raw_segments, start=1):
+    """「出発地,目的地,日付」形式の文字列群をDuffel APIのslices形式に変換する"""
+    slices = []
+    for raw in raw_segments:
         parts = [p.strip() for p in raw.split(",")]
         if len(parts) != 3:
-            raise AmadeusError(
+            raise DuffelError(
                 f"区間の指定が不正です: 「{raw}」（「出発地,目的地,日付」の形式で指定してください）"
             )
         origin_raw, dest_raw, date_raw = parts
         try:
             datetime.strptime(date_raw, "%Y-%m-%d")
         except ValueError:
-            raise AmadeusError(f"日付の形式が不正です: 「{date_raw}」（YYYY-MM-DD形式で指定してください）")
+            raise DuffelError(f"日付の形式が不正です: 「{date_raw}」（YYYY-MM-DD形式で指定してください）")
 
         origin_code = resolver.resolve(origin_raw)
         dest_code = resolver.resolve(dest_raw)
 
-        origin_destinations.append(
-            {
-                "id": str(i),
-                "originLocationCode": origin_code,
-                "destinationLocationCode": dest_code,
-                "departureDateTimeRange": {"date": date_raw},
-            }
-        )
-    return origin_destinations
+        slices.append({"origin": origin_code, "destination": dest_code, "departure_date": date_raw})
+    return slices
 
 
-def search_flights(token, origin_destinations, adults):
-    """Flight Offers Search API（マルチシティ対応のPOSTエンドポイント）でフライトを検索する"""
-    url = f"{BASE_URL}/v2/shopping/flight-offers"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-    }
+def search_flights(token, slices, adults):
+    """POST /air/offer_requestsでフライトを検索する（return_offers=trueで同一レスポンスに結果を含める）"""
+    url = f"{BASE_URL}/air/offer_requests"
     body = {
-        "currencyCode": "USD",
-        "originDestinations": origin_destinations,
-        "travelers": [{"id": str(i + 1), "travelerType": "ADULT"} for i in range(adults)],
-        "sources": ["GDS"],
-        "searchCriteria": {"maxFlightOffers": 50},
+        "data": {
+            "slices": slices,
+            "passengers": [{"type": "adult"} for _ in range(adults)],
+        }
     }
 
     try:
-        resp = requests.post(url, json=body, headers=headers, timeout=30)
+        resp = requests.post(
+            url,
+            params={"return_offers": "true"},
+            json=body,
+            headers=_headers(token, with_content_type=True),
+            timeout=60,
+        )
     except requests.RequestException as e:
-        raise AmadeusError(f"フライト検索中に接続エラーが発生しました: {e}")
+        raise DuffelError(f"フライト検索中に接続エラーが発生しました: {e}")
 
     if resp.status_code == 401:
-        raise AmadeusError("認証エラーが発生しました。トークンが無効か期限切れです。")
+        raise DuffelError("認証に失敗しました。DUFFEL_ACCESS_TOKENを確認してください。")
     if resp.status_code == 429:
-        raise AmadeusError("APIのレート制限を超過しました。しばらく待ってから再実行してください。")
-    if resp.status_code == 400:
-        raise AmadeusError(f"検索条件が不正です: {resp.text}")
+        raise DuffelError("APIのレート制限を超過しました。しばらく待ってから再実行してください。")
+    if resp.status_code == 422:
+        raise DuffelError(f"検索条件が不正です: {_extract_error_message(resp)}")
     if not resp.ok:
-        raise AmadeusError(f"フライト検索に失敗しました（HTTP {resp.status_code}）: {resp.text}")
+        raise DuffelError(f"フライト検索に失敗しました（HTTP {resp.status_code}）: {_extract_error_message(resp)}")
 
-    data = resp.json().get("data", [])
-    if not data:
-        raise AmadeusError("該当するフライトが見つかりませんでした。条件を変えて再検索してください。")
-    return data
+    offers = resp.json().get("data", {}).get("offers", [])
+    if not offers:
+        raise DuffelError("該当するフライトが見つかりませんでした。条件を変えて再検索してください。")
+    return offers
 
 
 def format_offer(offer):
     """API結果を表示・CSV出力用の簡易な形に整形する"""
-    price = offer["price"]
-
-    itineraries_text = []
-    for itinerary in offer["itineraries"]:
+    slices_text = []
+    for slice_ in offer["slices"]:
         seg_texts = []
-        for seg in itinerary["segments"]:
-            carrier = seg["carrierCode"]
-            number = seg["number"]
-            dep = seg["departure"]
-            arr = seg["arrival"]
+        for seg in slice_["segments"]:
+            carrier = seg["marketing_carrier"]["iata_code"]
+            number = seg["marketing_carrier_flight_number"]
+            origin = seg["origin"]["iata_code"]
+            destination = seg["destination"]["iata_code"]
             seg_texts.append(
-                f"{carrier}{number} {dep['iataCode']} {dep['at']} → {arr['iataCode']} {arr['at']}"
+                f"{carrier}{number} {origin} {seg['departing_at']} → {destination} {seg['arriving_at']}"
             )
-        itineraries_text.append(" / ".join(seg_texts))
+        slices_text.append(" / ".join(seg_texts))
 
     return {
-        "price": float(price["total"]),
-        "currency": price["currency"],
-        "route": " | ".join(itineraries_text),
+        "price": float(offer["total_amount"]),
+        "currency": offer["total_currency"],
+        "route": " | ".join(slices_text),
     }
 
 
@@ -207,7 +214,7 @@ def write_csv(offers, path):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Amadeus APIを使った汎用フライト検索CLI")
+    parser = argparse.ArgumentParser(description="Duffel APIを使った汎用フライト検索CLI")
     parser.add_argument(
         "--segments",
         "-s",
@@ -222,10 +229,9 @@ def main():
     parser.add_argument("--csv", metavar="FILE", help="検索結果をCSVファイルにも出力する")
     args = parser.parse_args()
 
-    api_key = os.environ.get("AMADEUS_API_KEY")
-    api_secret = os.environ.get("AMADEUS_API_SECRET")
-    if not api_key or not api_secret:
-        print("エラー: 環境変数 AMADEUS_API_KEY / AMADEUS_API_SECRET を設定してください。", file=sys.stderr)
+    token = os.environ.get("DUFFEL_ACCESS_TOKEN")
+    if not token:
+        print("エラー: 環境変数 DUFFEL_ACCESS_TOKEN を設定してください。", file=sys.stderr)
         sys.exit(1)
 
     if args.adults < 1:
@@ -233,11 +239,11 @@ def main():
         sys.exit(1)
 
     try:
-        token = get_access_token(api_key, api_secret)
+        check_token(token)
         resolver = LocationResolver(token)
-        origin_destinations = parse_segments(args.segments, resolver)
-        raw_offers = search_flights(token, origin_destinations, args.adults)
-    except AmadeusError as e:
+        slices = parse_segments(args.segments, resolver)
+        raw_offers = search_flights(token, slices, args.adults)
+    except DuffelError as e:
         print(f"エラー: {e}", file=sys.stderr)
         sys.exit(1)
 

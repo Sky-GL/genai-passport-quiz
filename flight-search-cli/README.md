@@ -1,12 +1,13 @@
 # flight-search-cli
 
-Amadeus Self-Service API（Flight Offers Search）を使った汎用フライト検索CLIツール。
+Duffel APIを使った汎用フライト検索CLIツール。
 
 国内線・国際線、単純往復、オープンジョーを含むマルチシティ（2〜4区間程度）の検索に対応する。
+検索（offer_requests作成）のみを行い、予約・発券は行わない。予約はGoogle Flightsか航空会社サイトで別途行うこと。
 
 ## セットアップ
 
-1. https://developers.amadeus.com/ でアカウントを作成し、Self-Service APIのAPI Key / API Secretを取得する
+1. https://duffel.com/ でアカウントを作成し、ダッシュボードからアクセストークン（test/live）を発行する
 2. 依存ライブラリをインストールする
 
 ```bash
@@ -16,11 +17,8 @@ pip install -r requirements.txt
 3. 環境変数を設定する（`.env.example` を参考に）
 
 ```bash
-export AMADEUS_API_KEY=your-api-key
-export AMADEUS_API_SECRET=your-api-secret
+export DUFFEL_ACCESS_TOKEN=duffel_test_xxxxx
 ```
-
-デフォルトではAmadeusのテスト環境（`https://test.api.amadeus.com`）を使用する。本番環境を使う場合は `AMADEUS_BASE_URL=https://api.amadeus.com` を設定する。
 
 ## 使い方
 
@@ -51,3 +49,8 @@ python flight_search.py --segments NRT,SIN,2026-11-06 --csv result.csv
 ```
 
 検索結果は価格が安い順に上位5件を表示する（航空会社・便名、出発/到着時刻、概算運賃）。
+
+## 注意事項
+
+- フライト検索（offer_requests作成）自体は無料。実際の予約・発券まで進めない限り課金は発生しない
+- 本ツールは検索・スクリーニング用途のみ
