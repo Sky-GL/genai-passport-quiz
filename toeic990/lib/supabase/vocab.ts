@@ -37,6 +37,7 @@ export async function getDueVocabCards(limit = 30, category?: string): Promise<V
     .from("vocab_cards")
     .select("*")
     .lte("due", new Date().toISOString())
+    .eq("excluded", false)
     .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`)
     .order("due", { ascending: true })
     .limit(limit);
@@ -58,6 +59,7 @@ export async function getWeakVocabCards(limit = 20): Promise<VocabCardRow[]> {
   const { data, error } = await supabase
     .from("vocab_cards")
     .select("*")
+    .eq("excluded", false)
     .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`)
     .gt("lapses", 0)
     .order("lapses", { ascending: false })
@@ -86,6 +88,7 @@ export async function getDueVocabCardCount(): Promise<number> {
     .from("vocab_cards")
     .select("id", { count: "exact", head: true })
     .lte("due", new Date().toISOString())
+    .eq("excluded", false)
     .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`);
 
   if (error) throw error;
@@ -104,7 +107,7 @@ export async function getVocabCardById(id: string): Promise<VocabCardRow | null>
   return data;
 }
 
-export async function updateVocabCardAfterReview(id: string, card: Card) {
+export async function updateVocabCardAfterReview(id: string, card: Card, excluded = false) {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase
     .from("vocab_cards")
@@ -118,6 +121,7 @@ export async function updateVocabCardAfterReview(id: string, card: Card) {
       lapses: card.lapses,
       state: card.state,
       last_review: card.last_review ? card.last_review.toISOString() : null,
+      excluded,
     })
     .eq("id", id);
 

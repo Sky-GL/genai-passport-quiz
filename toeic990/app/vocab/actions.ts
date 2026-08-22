@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { gradeCard, type Grade } from "@/lib/fsrs";
+import { gradeCard, Rating, type Grade } from "@/lib/fsrs";
 import {
   getVocabCardById,
   rowToCard,
@@ -16,7 +16,8 @@ export async function submitVocabReview(cardId: string, grade: Grade) {
 
   const currentCard = rowToCard(row);
   const nextCard = gradeCard(currentCard, grade);
-  await updateVocabCardAfterReview(cardId, nextCard);
+  // 「簡単」と判定した単語は十分習得済みとみなし、以後の出題対象から除外する
+  await updateVocabCardAfterReview(cardId, nextCard, grade === Rating.Easy);
 
   const xp = XP_BY_GRADE[grade];
   await recordStudyActivity(xp);
