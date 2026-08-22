@@ -19,4 +19,5 @@ export type VocabCardRow = {
   etymology: string | null;
   word_family: string | null;
   toeic_level: number | null;
+  excluded: boolean;
 };
