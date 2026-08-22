@@ -31,8 +31,8 @@ export default async function VocabPage({ searchParams }: Props) {
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-center gap-7 px-8 py-12">
       <div className="flex w-full max-w-[420px] items-center justify-between">
-        <h1 className="font-heading text-lg font-bold text-ink">単語・文法SRS</h1>
-        <Link href="/dashboard" className="text-[13px] text-ink-muted no-underline">
+        <h1 className="font-heading text-xl font-bold text-ink">単語・文法SRS</h1>
+        <Link href="/dashboard" className="text-[14px] text-ink-muted no-underline">
           ダッシュボードへ戻る
         </Link>
       </div>
@@ -40,7 +40,7 @@ export default async function VocabPage({ searchParams }: Props) {
       <div className="flex w-full max-w-[420px] gap-2 border-b border-border/60">
         <Link
           href="/vocab"
-          className={`px-1 pb-2.5 text-sm font-bold no-underline transition-all duration-300 ease-spring ${
+          className={`px-1 pb-2.5 text-base font-bold no-underline transition-all duration-300 ease-spring ${
             mode === "vocab" ? "border-b-2 border-primary text-primary" : "text-ink-muted hover:text-ink"
           }`}
         >
@@ -48,7 +48,7 @@ export default async function VocabPage({ searchParams }: Props) {
         </Link>
         <Link
           href="/vocab?mode=grammar"
-          className={`px-1 pb-2.5 text-sm font-bold no-underline transition-all duration-300 ease-spring ${
+          className={`px-1 pb-2.5 text-base font-bold no-underline transition-all duration-300 ease-spring ${
             mode === "grammar" ? "border-b-2 border-primary text-primary" : "text-ink-muted hover:text-ink"
           }`}
         >
@@ -59,7 +59,7 @@ export default async function VocabPage({ searchParams }: Props) {
       <div className="flex w-full max-w-[420px] gap-1.5">
         <Link
           href={modeQuery || "/vocab"}
-          className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+          className={`rounded-full px-3.5 py-1.5 text-[14px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
             !weak ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
           }`}
         >
@@ -67,7 +67,7 @@ export default async function VocabPage({ searchParams }: Props) {
         </Link>
         <Link
           href={`/vocab${modeQuery ? `${modeQuery}&weak=1` : "?weak=1"}`}
-          className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+          className={`rounded-full px-3.5 py-1.5 text-[14px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
             weak ? "bg-danger text-white" : "bg-danger-soft text-danger-text"
           }`}
         >
@@ -96,7 +96,7 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
         <div className="flex w-full max-w-[340px] flex-wrap gap-1.5">
           <Link
             href="/vocab"
-            className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+            className={`rounded-full px-3.5 py-1.5 text-[13.5px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
               !category ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
             }`}
           >
@@ -106,7 +106,7 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
             <Link
               key={c}
               href={`/vocab?category=${encodeURIComponent(c)}`}
-              className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+              className={`rounded-full px-3.5 py-1.5 text-[13.5px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
                 category === c ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
               }`}
             >
