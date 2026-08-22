@@ -29,10 +29,10 @@ export default async function VocabPage({ searchParams }: Props) {
   const modeQuery = mode === "grammar" ? "?mode=grammar" : "";
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col items-center gap-7 px-8 py-12">
-      <div className="flex w-full max-w-[480px] items-center justify-between">
+    <main className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-6 sm:gap-6 sm:px-8 sm:py-10">
+      <div className="flex w-full max-w-[480px] flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-heading text-[30px] font-bold text-ink">単語・文法SRS</h1>
-        <Link href="/dashboard" className="text-[21px] text-ink-muted no-underline">
+        <Link href="/dashboard" className="text-[18px] text-ink-muted no-underline">
           ダッシュボードへ戻る
         </Link>
       </div>
@@ -93,10 +93,10 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
   return (
     <>
       {!weak && categories.length > 0 && (
-        <div className="flex w-full max-w-[480px] flex-wrap gap-2">
+        <div className="flex w-full max-w-[480px] gap-2 overflow-x-auto pb-1">
           <Link
             href="/vocab"
-            className={`rounded-full px-4 py-2 text-[20px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+            className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[20px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
               !category ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
             }`}
           >
@@ -106,7 +106,7 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
             <Link
               key={c}
               href={`/vocab?category=${encodeURIComponent(c)}`}
-              className={`rounded-full px-4 py-2 text-[20px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[20px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
                 category === c ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
               }`}
             >
