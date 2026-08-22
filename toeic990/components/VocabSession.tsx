@@ -88,7 +88,7 @@ export default function VocabSession({ cards }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-3.5">
-      <div className="flex w-full max-w-[340px] items-center justify-between text-[12.5px] font-medium text-ink-muted">
+      <div className="flex w-full max-w-[340px] items-center justify-between text-[13.5px] font-medium text-ink-muted">
         <span>残り {queue.length} / {total}枚</span>
         <span>{flipped ? "裏面" : "表面"}</span>
       </div>
@@ -120,7 +120,7 @@ export default function VocabSession({ cards }: Props) {
               type="button"
               disabled={isPending}
               onClick={() => handleGrade(grade)}
-              className={`h-[52px] rounded-[11px] text-xs font-bold transition-all duration-300 ease-spring hover:scale-[0.97] disabled:opacity-50 disabled:hover:scale-100 ${className}`}
+              className={`h-[52px] rounded-[11px] text-[13.5px] font-bold transition-all duration-300 ease-spring hover:scale-[0.97] disabled:opacity-50 disabled:hover:scale-100 ${className}`}
             >
               {label}
             </button>
