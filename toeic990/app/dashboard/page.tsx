@@ -25,8 +25,8 @@ const MENU_ICON_PATHS: Record<(typeof MENU_ITEMS)[number]["key"], string> = {
 function MenuIcon({ menuKey, active }: { menuKey: (typeof MENU_ITEMS)[number]["key"]; active: boolean }) {
   return (
     <svg
-      width="20"
-      height="20"
+      width="24"
+      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -74,14 +74,14 @@ export default async function DashboardPage() {
           <div className="relative flex flex-1 flex-col gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy p-7 text-white shadow-hero">
             <div className="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-            <div className="relative text-[12px] font-bold uppercase tracking-[0.14em] opacity-80">
+            <div className="relative text-[18px] font-bold uppercase tracking-[0.1em] opacity-80">
               今日の学習目標
             </div>
             <div className="relative flex items-baseline gap-2">
-              <span className="font-heading text-5xl font-bold">{progressCount}</span>
-              <span className="text-[17px] font-medium opacity-85">/ {goal}枚</span>
+              <span className="font-heading text-7xl font-bold">{progressCount}</span>
+              <span className="text-[26px] font-medium opacity-85">/ {goal}枚</span>
             </div>
-            <div className="relative h-1.5 overflow-hidden rounded-full bg-white/20">
+            <div className="relative h-2 overflow-hidden rounded-full bg-white/20">
               <div
                 className="h-full rounded-full bg-white transition-all duration-500 ease-spring"
                 style={{ width: `${progressPct}%` }}
@@ -90,16 +90,16 @@ export default async function DashboardPage() {
             {remaining > 0 ? (
               <Link
                 href="/vocab"
-                className="relative mt-1 h-[42px] w-fit rounded-[9px] bg-white px-4 text-[15px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+                className="relative mt-1 h-[55px] w-fit rounded-[9px] bg-white px-5 text-[22px] font-bold leading-[55px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
               >
                 残り{remaining}枚を復習する
               </Link>
             ) : goalAchieved ? (
-              <p className="relative mt-1 text-[15px] font-medium opacity-85">
+              <p className="relative mt-1 text-[22px] font-medium opacity-85">
                 今日の目標を達成しました 🎉
               </p>
             ) : (
-              <p className="relative mt-1 text-[15px] font-medium opacity-85">
+              <p className="relative mt-1 text-[22px] font-medium opacity-85">
                 本日復習できるカードがありません
               </p>
             )}
@@ -109,33 +109,33 @@ export default async function DashboardPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink-faint">
+          <div className="text-[18px] font-bold uppercase tracking-[0.1em] text-ink-faint">
             学習メニュー
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {MENU_ITEMS.map((item) => {
               const content = (
                 <div
-                  className={`flex flex-col gap-2.5 rounded-xl2 bg-surface p-5 transition-all duration-300 ease-spring ${
+                  className={`flex flex-col gap-3 rounded-xl2 bg-surface p-5 transition-all duration-300 ease-spring ${
                     item.active
                       ? "shadow-flat hover:-translate-y-1 hover:shadow-hover"
                       : "opacity-50"
                   }`}
                 >
                   <div
-                    className={`flex h-[38px] w-[38px] items-center justify-center rounded-[10px] ${
+                    className={`flex h-[44px] w-[44px] items-center justify-center rounded-[10px] ${
                       item.active ? "bg-primary-soft" : "bg-border/60"
                     }`}
                   >
                     <MenuIcon menuKey={item.key} active={item.active} />
                   </div>
-                  <div className="text-base font-bold text-ink">{item.label}</div>
+                  <div className="text-2xl font-bold text-ink">{item.label}</div>
                   {item.active ? (
-                    <div className="text-[13.5px] text-ink-muted">
+                    <div className="text-[20px] text-ink-muted">
                       {item.key === "vocab" ? `今日${dueCount}枚の復習` : "Part5・6演習"}
                     </div>
                   ) : (
-                    <div className="w-fit rounded-full bg-border/60 px-2 py-0.5 text-[12px] font-bold text-ink-muted">
+                    <div className="w-fit rounded-full bg-border/60 px-2.5 py-1 text-[18px] font-bold text-ink-muted">
                       準備中
                     </div>
                   )}

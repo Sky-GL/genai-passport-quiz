@@ -60,25 +60,25 @@ export default function VocabSession({ cards }: Props) {
     const accuracy = stats.reviewed > 0 ? Math.round((stats.correct / stats.reviewed) * 100) : 0;
 
     return (
-      <div className="relative flex min-h-[320px] w-full max-w-[340px] flex-col items-center justify-center gap-3.5 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
+      <div className="relative flex min-h-[360px] w-full max-w-[380px] flex-col items-center justify-center gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/25 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-white/10 blur-3xl" />
         <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-white/15 shadow-glow">
           <div className="h-6 w-6 rotate-45 rounded-md bg-accent" />
         </div>
-        <p className="relative font-heading text-xl font-bold">本日の復習は完了です</p>
-        <p className="relative text-[13px] opacity-80">
+        <p className="relative font-heading text-[30px] font-bold">本日の復習は完了です</p>
+        <p className="relative text-[20px] opacity-80">
           {stats.reviewed}枚 学習 ・ 正答率 {accuracy}% ・ +{stats.xp} XP
         </p>
         {stats.streak !== null && stats.streak > 0 && (
-          <div className="relative mt-1 flex items-center gap-1.5 rounded-full bg-white/12 px-3.5 py-1.5">
+          <div className="relative mt-1 flex items-center gap-2 rounded-full bg-white/12 px-4 py-2">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <span className="font-heading text-[13px] font-bold">連続記録 {stats.streak}日目</span>
+            <span className="font-heading text-[20px] font-bold">連続記録 {stats.streak}日目</span>
           </div>
         )}
         <Link
           href="/dashboard"
-          className="relative mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+          className="relative mt-2 h-[50px] rounded-[10px] bg-white px-6 text-[20px] font-bold leading-[50px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>
@@ -87,12 +87,12 @@ export default function VocabSession({ cards }: Props) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3.5">
-      <div className="flex w-full max-w-[340px] items-center justify-between text-[13.5px] font-medium text-ink-muted">
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex w-full max-w-[380px] items-center justify-between text-[20px] font-medium text-ink-muted">
         <span>残り {queue.length} / {total}枚</span>
         <span>{flipped ? "裏面" : "表面"}</span>
       </div>
-      <div className="h-1.5 w-full max-w-[340px] overflow-hidden rounded-full bg-primary-soft">
+      <div className="h-1.5 w-full max-w-[380px] overflow-hidden rounded-full bg-primary-soft">
         <div
           className="h-full rounded-full bg-primary transition-all"
           style={{ width: `${((total - queue.length) / total) * 100}%` }}
@@ -113,14 +113,14 @@ export default function VocabSession({ cards }: Props) {
       />
 
       {flipped && (
-        <div className="grid w-full max-w-[340px] grid-cols-4 gap-2">
+        <div className="grid w-full max-w-[380px] grid-cols-4 gap-2.5">
           {GRADE_BUTTONS.map(({ grade, label, className }) => (
             <button
               key={grade}
               type="button"
               disabled={isPending}
               onClick={() => handleGrade(grade)}
-              className={`h-[52px] rounded-[11px] text-[13.5px] font-bold transition-all duration-300 ease-spring hover:scale-[0.97] disabled:opacity-50 disabled:hover:scale-100 ${className}`}
+              className={`h-[68px] rounded-[11px] text-[20px] font-bold transition-all duration-300 ease-spring hover:scale-[0.97] disabled:opacity-50 disabled:hover:scale-100 ${className}`}
             >
               {label}
             </button>
