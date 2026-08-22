@@ -74,12 +74,12 @@ export default async function DashboardPage() {
           <div className="relative flex flex-1 flex-col gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy p-7 text-white shadow-hero">
             <div className="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-            <div className="relative text-[10px] font-bold uppercase tracking-[0.18em] opacity-80">
+            <div className="relative text-[12px] font-bold uppercase tracking-[0.14em] opacity-80">
               今日の学習目標
             </div>
             <div className="relative flex items-baseline gap-2">
               <span className="font-heading text-5xl font-bold">{progressCount}</span>
-              <span className="text-[15px] font-medium opacity-85">/ {goal}枚</span>
+              <span className="text-[17px] font-medium opacity-85">/ {goal}枚</span>
             </div>
             <div className="relative h-1.5 overflow-hidden rounded-full bg-white/20">
               <div
@@ -90,16 +90,16 @@ export default async function DashboardPage() {
             {remaining > 0 ? (
               <Link
                 href="/vocab"
-                className="relative mt-1 h-[38px] w-fit rounded-[9px] bg-white px-4 text-[13px] font-bold leading-[38px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+                className="relative mt-1 h-[42px] w-fit rounded-[9px] bg-white px-4 text-[15px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
               >
                 残り{remaining}枚を復習する
               </Link>
             ) : goalAchieved ? (
-              <p className="relative mt-1 text-[13px] font-medium opacity-85">
+              <p className="relative mt-1 text-[15px] font-medium opacity-85">
                 今日の目標を達成しました 🎉
               </p>
             ) : (
-              <p className="relative mt-1 text-[13px] font-medium opacity-85">
+              <p className="relative mt-1 text-[15px] font-medium opacity-85">
                 本日復習できるカードがありません
               </p>
             )}
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-faint">
+          <div className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink-faint">
             学習メニュー
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -129,13 +129,13 @@ export default async function DashboardPage() {
                   >
                     <MenuIcon menuKey={item.key} active={item.active} />
                   </div>
-                  <div className="text-sm font-bold text-ink">{item.label}</div>
+                  <div className="text-base font-bold text-ink">{item.label}</div>
                   {item.active ? (
-                    <div className="text-xs text-ink-muted">
+                    <div className="text-[13.5px] text-ink-muted">
                       {item.key === "vocab" ? `今日${dueCount}枚の復習` : "Part5・6演習"}
                     </div>
                   ) : (
-                    <div className="w-fit rounded-full bg-border/60 px-2 py-0.5 text-[10.5px] font-bold text-ink-muted">
+                    <div className="w-fit rounded-full bg-border/60 px-2 py-0.5 text-[12px] font-bold text-ink-muted">
                       準備中
                     </div>
                   )}

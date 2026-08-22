@@ -36,14 +36,14 @@ export default function MockTestQuestionCard({
     <div className="flex w-full max-w-[560px] flex-col gap-5 rounded-xl2 bg-surface p-7 shadow-card">
       {passage && (
         <div className="flex flex-col gap-1.5 rounded-[11px] bg-[oklch(0.96_0.008_265)] p-4">
-          <div className="text-[11px] font-bold text-ink-muted">{passage.title}</div>
-          <pre className="whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-ink">
+          <div className="text-[13px] font-bold text-ink-muted">{passage.title}</div>
+          <pre className="whitespace-pre-wrap font-sans text-[15px] leading-relaxed text-ink">
             {passage.passage_text}
           </pre>
         </div>
       )}
 
-      <p className="text-[15px] leading-relaxed text-ink">{question.question_text}</p>
+      <p className="text-[17px] leading-relaxed text-ink">{question.question_text}</p>
 
       <div className="flex flex-col gap-2.5">
         {CHOICE_KEYS.map((key) => {
@@ -68,14 +68,14 @@ export default function MockTestQuestionCard({
               type="button"
               disabled={!!feedback}
               onClick={() => onSelect(key)}
-              className={`flex items-center gap-2.5 rounded-[11px] border px-4 py-3 text-left text-sm transition-all duration-300 ease-spring disabled:cursor-default ${stateClass}`}
+              className={`flex items-center gap-2.5 rounded-[11px] border px-4 py-3 text-left text-[15px] transition-all duration-300 ease-spring disabled:cursor-default ${stateClass}`}
             >
-              <span className="font-heading text-xs font-bold text-ink-faint">{key}</span>
+              <span className="font-heading text-sm font-bold text-ink-faint">{key}</span>
               <span className="flex-1">{choices[key]}</span>
               {feedback && isSelected && !isCorrectChoice && (
-                <span className="text-[11px] font-bold">あなたの回答</span>
+                <span className="text-[12.5px] font-bold">あなたの回答</span>
               )}
-              {feedback && isCorrectChoice && <span className="text-[11px] font-bold">正解</span>}
+              {feedback && isCorrectChoice && <span className="text-[12.5px] font-bold">正解</span>}
             </button>
           );
         })}
@@ -83,8 +83,8 @@ export default function MockTestQuestionCard({
 
       {feedback && !feedback.isCorrect && (
         <div className="flex flex-col gap-1.5 rounded-[11px] bg-[oklch(0.96_0.008_265)] px-4 py-3">
-          <div className="text-[12.5px] font-bold text-ink">解説</div>
-          <div className="text-[13px] leading-relaxed text-ink-muted">{feedback.explanation}</div>
+          <div className="text-[14px] font-bold text-ink">解説</div>
+          <div className="text-[15px] leading-relaxed text-ink-muted">{feedback.explanation}</div>
         </div>
       )}
     </div>
