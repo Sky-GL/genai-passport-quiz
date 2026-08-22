@@ -72,27 +72,27 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
   if (phase === "select") {
     return (
-      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-xl2 bg-surface p-7 shadow-card">
+      <div className="flex w-full max-w-[460px] flex-col gap-6 rounded-xl2 bg-surface p-7 shadow-card">
         <div className="flex flex-col gap-3">
           {(["practice", "timed"] as Mode[]).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setMode(m)}
-              className={`flex items-center gap-3 rounded-[11px] border px-4 py-3 text-left transition-all duration-300 ease-spring ${
+              className={`flex items-center gap-3 rounded-[11px] border px-4 py-3.5 text-left transition-all duration-300 ease-spring ${
                 mode === m ? "border-primary bg-primary-soft" : "border-border/50 hover:border-primary/30"
               }`}
             >
               <span
-                className={`h-4 w-4 shrink-0 rounded-full border-2 transition-all duration-300 ${
+                className={`h-5 w-5 shrink-0 rounded-full border-2 transition-all duration-300 ${
                   mode === m ? "border-primary bg-primary" : "border-border"
                 }`}
               />
-              <span className="flex flex-col">
-                <span className="text-sm font-bold text-ink">
+              <span className="flex flex-col gap-0.5">
+                <span className="text-[21px] font-bold text-ink">
                   {m === "timed" ? "制限時間モード" : "演習モード"}
                 </span>
-                <span className="text-xs text-ink-muted">
+                <span className="text-[18px] text-ink-muted">
                   {m === "timed" ? "1問60秒の目安で時間内に解答" : "時間無制限でじっくり解答"}
                 </span>
               </span>
@@ -100,7 +100,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
           ))}
         </div>
 
-        <div className="flex flex-col gap-1 text-[13px] text-ink-muted">
+        <div className="flex flex-col gap-1 text-[20px] text-ink-muted">
           <div>Part5(短文穴埋め): {part5Count}問</div>
           <div>Part6(長文穴埋め): {part6Count}問</div>
         </div>
@@ -108,7 +108,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
         <button
           type="button"
           onClick={startSession}
-          className="h-[46px] rounded-[10px] bg-primary text-sm font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
+          className="h-[60px] rounded-[10px] bg-primary text-[21px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
         >
           演習を開始する
         </button>
@@ -123,12 +123,12 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
     return (
       <div className="flex w-full flex-col items-center gap-4">
-        <div className="flex w-full max-w-[560px] items-center justify-between rounded-xl2 bg-navy px-5 py-3.5 text-white">
-          <span className="font-heading text-sm font-bold">
+        <div className="flex w-full max-w-[620px] items-center justify-between rounded-xl2 bg-navy px-5 py-4 text-white">
+          <span className="font-heading text-[21px] font-bold">
             {current.part === "part5" ? "Part 5" : "Part 6"} ・ Q{index + 1}/{questions.length}
           </span>
           {mode === "timed" && (
-            <span className="font-heading text-sm font-bold text-accent">
+            <span className="font-heading text-[21px] font-bold text-accent">
               {formatTime(remainingSeconds)}
             </span>
           )}
@@ -142,12 +142,12 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
           onSelect={(choice) => handleSelect(current.id, choice)}
         />
 
-        <div className="flex w-full max-w-[560px] justify-between">
+        <div className="flex w-full max-w-[620px] justify-between">
           <button
             type="button"
             disabled={index === 0}
             onClick={() => setIndex((i) => i - 1)}
-            className="h-[42px] rounded-[10px] px-5 text-[13px] font-bold text-ink shadow-flat transition-all duration-300 ease-spring hover:scale-[0.98] disabled:opacity-40 disabled:hover:scale-100"
+            className="h-[55px] rounded-[10px] px-6 text-[20px] font-bold text-ink shadow-flat transition-all duration-300 ease-spring hover:scale-[0.98] disabled:opacity-40 disabled:hover:scale-100"
           >
             前へ
           </button>
@@ -156,7 +156,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
               type="button"
               disabled={isPending}
               onClick={handleSubmit}
-              className="h-[42px] rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark disabled:opacity-50 disabled:hover:scale-100"
+              className="h-[55px] rounded-[10px] bg-primary px-6 text-[20px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark disabled:opacity-50 disabled:hover:scale-100"
             >
               {isPending ? "採点中..." : "採点する"}
             </button>
@@ -164,7 +164,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
             <button
               type="button"
               onClick={() => setIndex((i) => i + 1)}
-              className="h-[42px] rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
+              className="h-[55px] rounded-[10px] bg-primary px-6 text-[20px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
             >
               次へ
             </button>
@@ -176,27 +176,27 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
   if (phase === "results" && result) {
     return (
-      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-xl3 bg-surface p-7 shadow-hero">
-        <div className="relative flex flex-col items-center gap-1 overflow-hidden rounded-xl2 bg-primary-soft py-6 text-center">
+      <div className="flex w-full max-w-[460px] flex-col gap-6 rounded-xl3 bg-surface p-7 shadow-hero">
+        <div className="relative flex flex-col items-center gap-1.5 overflow-hidden rounded-xl2 bg-primary-soft py-7 text-center">
           <div className="pointer-events-none absolute -top-10 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
-          <span className="relative text-[10px] font-bold uppercase tracking-[0.18em] text-primary-dark/70">
+          <span className="relative text-[15px] font-bold uppercase tracking-[0.12em] text-primary-dark/70">
             目安スコア
           </span>
-          <span className="relative font-heading text-6xl font-bold text-primary">
+          <span className="relative font-heading text-[78px] font-bold leading-none text-primary">
             {result.overallScoreEstimate}
           </span>
-          <span className="relative text-[13px] text-primary-dark/80">
+          <span className="relative text-[20px] text-primary-dark/80">
             {result.correctCount} / {result.totalCount}問正解 ・ +{result.xp} XP
           </span>
         </div>
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-3">
           {result.partAccuracy.map(({ part, correct, total }) => {
             const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
             const barColor = pct >= 70 ? "bg-success" : pct >= 40 ? "bg-accent" : "bg-danger";
             return (
-              <div key={part} className="flex flex-col gap-1">
-                <div className="flex items-center justify-between text-xs text-ink-muted">
+              <div key={part} className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-[18px] text-ink-muted">
                   <span>{part === "part5" ? "Part5" : "Part6"}</span>
                   <span>{pct}%</span>
                 </div>
@@ -213,7 +213,7 @@ export default function MockTestApp({ questions, passages }: MockTestSet) {
 
         <Link
           href="/dashboard"
-          className="h-[42px] rounded-[10px] bg-primary text-center text-[13px] font-bold leading-[42px] text-white no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+          className="h-[55px] rounded-[10px] bg-primary text-center text-[20px] font-bold leading-[55px] text-white no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>

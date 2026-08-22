@@ -47,16 +47,16 @@ export default function GrammarSession({ questions }: Props) {
     const accuracy = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
 
     return (
-      <div className="relative flex min-h-[280px] w-full max-w-[420px] flex-col items-center justify-center gap-3.5 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
+      <div className="relative flex min-h-[320px] w-full max-w-[460px] flex-col items-center justify-center gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/25 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-white/10 blur-3xl" />
-        <p className="relative font-heading text-xl font-bold">文法問題は完了です</p>
-        <p className="relative text-[13px] opacity-80">
+        <p className="relative font-heading text-[30px] font-bold">文法問題は完了です</p>
+        <p className="relative text-[20px] opacity-80">
           {stats.answered}問 回答 ・ 正答率 {accuracy}% ・ +{stats.xp} XP
         </p>
         <Link
           href="/dashboard"
-          className="relative mt-2 h-[42px] rounded-[10px] bg-white px-5 text-[13px] font-bold leading-[42px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
+          className="relative mt-2 h-[50px] rounded-[10px] bg-white px-6 text-[20px] font-bold leading-[50px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
         >
           ダッシュボードに戻る
         </Link>
@@ -65,7 +65,7 @@ export default function GrammarSession({ questions }: Props) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3.5">
+    <div className="flex flex-col items-center gap-4">
       <GrammarQuestion
         question={current}
         index={index + 1}
@@ -79,7 +79,7 @@ export default function GrammarSession({ questions }: Props) {
         <button
           type="button"
           onClick={handleNext}
-          className="h-[42px] w-full max-w-[420px] self-end rounded-[10px] bg-primary px-5 text-[13px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
+          className="h-[50px] w-full max-w-[460px] self-end rounded-[10px] bg-primary px-5 text-[20px] font-bold text-white transition-all duration-300 ease-spring hover:scale-[0.98] hover:bg-primary-dark"
         >
           次の問題へ
         </button>

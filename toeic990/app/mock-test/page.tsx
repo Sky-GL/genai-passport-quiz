@@ -18,15 +18,15 @@ export default async function MockTestPage() {
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-center gap-7 px-8 py-12">
-      <div className="flex w-full max-w-[560px] items-center justify-between">
-        <h1 className="font-heading text-lg font-bold text-ink">模試形式演習</h1>
-        <Link href="/dashboard" className="text-[13px] text-ink-muted no-underline">
+      <div className="flex w-full max-w-[620px] items-center justify-between">
+        <h1 className="font-heading text-[30px] font-bold text-ink">模試形式演習</h1>
+        <Link href="/dashboard" className="text-[21px] text-ink-muted no-underline">
           ダッシュボードへ戻る
         </Link>
       </div>
 
       {questions.length === 0 ? (
-        <p className="py-16 text-center text-ink-muted">問題が登録されていません。</p>
+        <p className="py-16 text-center text-[24px] text-ink-muted">問題が登録されていません。</p>
       ) : (
         <MockTestApp questions={questions} passages={passages} />
       )}

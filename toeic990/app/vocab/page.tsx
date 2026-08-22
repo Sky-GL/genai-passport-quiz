@@ -30,17 +30,17 @@ export default async function VocabPage({ searchParams }: Props) {
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-center gap-7 px-8 py-12">
-      <div className="flex w-full max-w-[420px] items-center justify-between">
-        <h1 className="font-heading text-lg font-bold text-ink">単語・文法SRS</h1>
-        <Link href="/dashboard" className="text-[13px] text-ink-muted no-underline">
+      <div className="flex w-full max-w-[480px] items-center justify-between">
+        <h1 className="font-heading text-[30px] font-bold text-ink">単語・文法SRS</h1>
+        <Link href="/dashboard" className="text-[21px] text-ink-muted no-underline">
           ダッシュボードへ戻る
         </Link>
       </div>
 
-      <div className="flex w-full max-w-[420px] gap-2 border-b border-border/60">
+      <div className="flex w-full max-w-[480px] gap-2 border-b border-border/60">
         <Link
           href="/vocab"
-          className={`px-1 pb-2.5 text-sm font-bold no-underline transition-all duration-300 ease-spring ${
+          className={`px-1 pb-2.5 text-2xl font-bold no-underline transition-all duration-300 ease-spring ${
             mode === "vocab" ? "border-b-2 border-primary text-primary" : "text-ink-muted hover:text-ink"
           }`}
         >
@@ -48,7 +48,7 @@ export default async function VocabPage({ searchParams }: Props) {
         </Link>
         <Link
           href="/vocab?mode=grammar"
-          className={`px-1 pb-2.5 text-sm font-bold no-underline transition-all duration-300 ease-spring ${
+          className={`px-1 pb-2.5 text-2xl font-bold no-underline transition-all duration-300 ease-spring ${
             mode === "grammar" ? "border-b-2 border-primary text-primary" : "text-ink-muted hover:text-ink"
           }`}
         >
@@ -56,10 +56,10 @@ export default async function VocabPage({ searchParams }: Props) {
         </Link>
       </div>
 
-      <div className="flex w-full max-w-[420px] gap-1.5">
+      <div className="flex w-full max-w-[480px] gap-2">
         <Link
           href={modeQuery || "/vocab"}
-          className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+          className={`rounded-full px-5 py-2 text-[21px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
             !weak ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
           }`}
         >
@@ -67,7 +67,7 @@ export default async function VocabPage({ searchParams }: Props) {
         </Link>
         <Link
           href={`/vocab${modeQuery ? `${modeQuery}&weak=1` : "?weak=1"}`}
-          className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+          className={`rounded-full px-5 py-2 text-[21px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
             weak ? "bg-danger text-white" : "bg-danger-soft text-danger-text"
           }`}
         >
@@ -93,10 +93,10 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
   return (
     <>
       {!weak && categories.length > 0 && (
-        <div className="flex w-full max-w-[340px] flex-wrap gap-1.5">
+        <div className="flex w-full max-w-[480px] flex-wrap gap-2">
           <Link
             href="/vocab"
-            className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+            className={`rounded-full px-4 py-2 text-[20px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
               !category ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
             }`}
           >
@@ -106,7 +106,7 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
             <Link
               key={c}
               href={`/vocab?category=${encodeURIComponent(c)}`}
-              className={`rounded-full px-3 py-1 text-xs font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
+              className={`rounded-full px-4 py-2 text-[20px] font-bold no-underline transition-all duration-300 ease-spring hover:scale-[0.98] ${
                 category === c ? "bg-primary text-white" : "bg-primary-soft text-primary-dark"
               }`}
             >
@@ -117,7 +117,7 @@ async function VocabModeContent({ category, weak }: { category?: string; weak: b
       )}
 
       {cards.length === 0 ? (
-        <p className="py-16 text-center text-ink-muted">
+        <p className="py-16 text-center text-[24px] text-ink-muted">
           {weak ? "苦手な単語はまだありません。" : "本日復習予定のカードはありません。"}
         </p>
       ) : (
@@ -134,7 +134,7 @@ async function GrammarModeContent({ weak }: { weak: boolean }) {
 
   if (questions.length === 0) {
     return (
-      <p className="py-16 text-center text-ink-muted">
+      <p className="py-16 text-center text-[24px] text-ink-muted">
         {weak
           ? "誤答した文法問題はまだありません。"
           : "すべての文法問題に回答済みです。お疲れさまでした。"}

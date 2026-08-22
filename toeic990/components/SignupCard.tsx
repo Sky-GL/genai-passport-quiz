@@ -15,7 +15,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="mt-2 h-[46px] rounded-[10px] bg-white font-bold text-sm text-primary-dark shadow-glow transition-all duration-300 ease-spring hover:scale-[0.98] active:scale-[0.96] disabled:opacity-50 disabled:hover:scale-100"
+      className="mt-2 h-[62px] rounded-[10px] bg-white text-[20px] font-bold text-primary-dark shadow-glow transition-all duration-300 ease-spring hover:scale-[0.98] active:scale-[0.96] disabled:opacity-50 disabled:hover:scale-100"
     >
       {pending ? "処理中..." : "登録する"}
     </button>
@@ -28,11 +28,11 @@ export default function SignupCard() {
 
   if (!state.error && state !== initialState) {
     return (
-      <div className="flex flex-col items-center gap-6 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success/20 ring-1 ring-success/40">
+      <div className="flex flex-col items-center gap-7 text-center">
+        <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-success/20 ring-1 ring-success/40">
           <svg
-            width="22"
-            height="22"
+            width="33"
+            height="33"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -44,13 +44,13 @@ export default function SignupCard() {
             <path d="M4 12.5l5 5L20 6" />
           </svg>
         </div>
-        <div className="flex flex-col gap-2">
-          <h1 className="font-heading text-lg font-bold text-white">確認メールを送信しました</h1>
-          <p className="max-w-[280px] text-[13.5px] leading-relaxed text-white/60">
+        <div className="flex flex-col gap-3">
+          <h1 className="font-heading text-[27px] font-bold text-white">確認メールを送信しました</h1>
+          <p className="max-w-[340px] text-[20px] leading-relaxed text-white/60">
             {email || "ご登録のメールアドレス"} 宛にメールを送りました。リンクをクリックして登録を完了してください。
           </p>
         </div>
-        <Link href="/login" className="text-[13px] font-medium text-white no-underline">
+        <Link href="/login" className="text-[19px] font-medium text-white no-underline">
           ログイン画面に戻る
         </Link>
       </div>
@@ -59,9 +59,9 @@ export default function SignupCard() {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-1.5 text-center">
-        <h1 className="font-heading text-2xl font-bold text-white">TOEIC 990</h1>
-        <p className="text-[13px] text-white/60">新規登録して学習を始めましょう。</p>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="font-heading text-[30px] font-bold text-white">TOEIC 990</h1>
+        <p className="text-[19px] text-white/60">新規登録して学習を始めましょう。</p>
       </div>
 
       <form
@@ -70,10 +70,10 @@ export default function SignupCard() {
           const form = e.currentTarget;
           setEmail((form.elements.namedItem("email") as HTMLInputElement)?.value ?? "");
         }}
-        className="flex flex-col gap-3.5"
+        className="flex flex-col gap-5"
       >
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">
+        <div className="flex flex-col gap-2">
+          <label htmlFor="email" className="text-[15px] font-bold uppercase tracking-[0.1em] text-white/50">
             メールアドレス
           </label>
           <input
@@ -81,11 +81,11 @@ export default function SignupCard() {
             name="email"
             type="email"
             required
-            className="h-11 rounded-[10px] border border-white/15 bg-white/10 px-3.5 text-sm text-white backdrop-blur-sm transition-all duration-200 placeholder:text-white/30 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/15"
+            className="h-[60px] rounded-[10px] border border-white/15 bg-white/10 px-4 text-[20px] text-white backdrop-blur-sm transition-all duration-200 placeholder:text-white/30 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/15"
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">
+        <div className="flex flex-col gap-2">
+          <label htmlFor="password" className="text-[15px] font-bold uppercase tracking-[0.1em] text-white/50">
             パスワード
           </label>
           <input
@@ -94,16 +94,16 @@ export default function SignupCard() {
             type="password"
             required
             minLength={6}
-            className="h-11 rounded-[10px] border border-white/15 bg-white/10 px-3.5 text-sm text-white backdrop-blur-sm transition-all duration-200 placeholder:text-white/30 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/15"
+            className="h-[60px] rounded-[10px] border border-white/15 bg-white/10 px-4 text-[20px] text-white backdrop-blur-sm transition-all duration-200 placeholder:text-white/30 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/15"
           />
         </div>
 
         {state.error && (
           <div
             role="alert"
-            className="flex flex-col gap-2 rounded-[10px] border border-danger/30 bg-danger/15 px-3.5 py-2.5"
+            className="flex flex-col gap-2 rounded-[10px] border border-danger/30 bg-danger/15 px-4 py-3"
           >
-            <p className="text-[12.5px] font-medium leading-normal text-[oklch(0.85_0.1_25)]">
+            <p className="text-[19px] font-medium leading-normal text-[oklch(0.85_0.1_25)]">
               {state.error}
             </p>
           </div>
@@ -112,7 +112,7 @@ export default function SignupCard() {
         <SubmitButton />
       </form>
 
-      <p className="text-center text-[13px] text-white/60">
+      <p className="text-center text-[19px] text-white/60">
         すでにアカウントをお持ちの方は{" "}
         <Link href="/login" className="font-bold text-white no-underline">
           ログイン
