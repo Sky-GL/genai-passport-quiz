@@ -21,6 +21,16 @@ export function rowToCard(row: VocabCardRow): Card {
 const MASTERED_STATE = 2;
 const MASTERED_STABILITY_DAYS = 30;
 
+// Fisher-Yatesシャッフル。毎回同じ並び順にならないよう、出題直前にランダム化する
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export async function getDueVocabCards(limit = 30, category?: string): Promise<VocabCardRow[]> {
   const supabase = await createSupabaseServerClient();
   let query = supabase
@@ -38,7 +48,7 @@ export async function getDueVocabCards(limit = 30, category?: string): Promise<V
   const { data, error } = await query;
 
   if (error) throw error;
-  return data ?? [];
+  return shuffle(data ?? []);
 }
 
 // 苦手復習: lapses(失敗回数)が多い順、次いでdifficultyが高い順に出題する。
@@ -55,7 +65,7 @@ export async function getWeakVocabCards(limit = 20): Promise<VocabCardRow[]> {
     .limit(limit);
 
   if (error) throw error;
-  return data ?? [];
+  return shuffle(data ?? []);
 }
 
 export async function getVocabCategories(): Promise<string[]> {
