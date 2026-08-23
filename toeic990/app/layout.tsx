@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
@@ -17,6 +17,14 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "TOEIC990",
   description: "TOEIC990点取得を目指す学習アプリ",
+  appleWebApp: {
+    title: "TOEIC990",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0C0E1E",
 };
 
 export default function RootLayout({

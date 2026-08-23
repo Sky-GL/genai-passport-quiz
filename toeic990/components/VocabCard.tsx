@@ -127,7 +127,9 @@ export default function VocabCard({
         </div>
       ) : (
         <>
-          <p className="break-words font-heading text-[58px] font-bold text-ink">{front}</p>
+          <p className="w-full break-words text-center font-heading text-[58px] font-bold leading-tight text-ink">
+            {front}
+          </p>
           <span className="text-[24px] text-ink-faint">タップして意味を表示</span>
         </>
       )}
