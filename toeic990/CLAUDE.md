@@ -44,6 +44,7 @@ TOEIC990点取得を目指す学習者向けの学習アプリ。Web優先（Nex
 - **チャットのコードブロックからのSQLコピペは文字化けのリスクがある**（アポストロフィ`'`がスマートクォート`’`に変換され、文字列リテラルが壊れて構文エラーになることがあった）。アポストロフィを含む長いSQL(例: `company's`のような英文が入る例文)は、可能ならファイルとして送る方が安全。どうしてもコードブロックで求められた場合は、エラーが出たら文字化けを疑う
 - **単語データ(vocab_cards)はリポジトリに存在しない**。スキーマ変更(カラム追加等)は`supabase/migrations/`にコミットするが、実際の単語データ(INSERT文)はユーザーに直接SQLを渡して実行してもらう一回限りの作業で、リポジトリには残らない。新しい単語バッチを作る際は、既存の単語と重複しないよう会話履歴やscratchpadの過去SQLを確認する
 - **モバイルのレスポンシブ対応を忘れやすい**。ヘッダー等の横並びバッジ+テキストの`flex items-center justify-between`は、スマホ幅で子要素が潰れて縦書きのように折り返される事故が起きた。バッジ類には`shrink-0 whitespace-nowrap`、可変長テキストには`min-w-0 truncate`、必要なら`flex-col sm:flex-row`で段組みを切り替える
+- **DBスキーマ変更を伴う機能は、SQL実行を確認してからデプロイする**。新カラムを参照するコードを先にmainへ出すと、SQL未実行の間ずっと本番が落ちる(実際に`grammar_answers.ever_incorrect`で「Application error: a server-side exception has occurred」を発生させた)。順序は必ず「①SQL実行の完了を確認 → ②mainへマージ」。SQLが2本以上ある場合は、どれが未実行かを取り違えやすいので、デプロイ前に`information_schema.columns`等で実際にカラムが存在するか確認する
 
 ## デザイントークン(tailwind.config.ts)
 - 角丸: `rounded-xl2`(20px)を通常カード、`rounded-xl3`(28px)をヒーロー/達成演出カードに使う

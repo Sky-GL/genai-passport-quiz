@@ -9,6 +9,7 @@ type Props = {
   etymology: string | null;
   wordFamily: string | null;
   toeicLevel: number | null;
+  pronunciation: string | null;
   flipped: boolean;
   onFlip: () => void;
 };
@@ -52,6 +53,7 @@ export default function VocabCard({
   etymology,
   wordFamily,
   toeicLevel,
+  pronunciation,
   flipped,
   onFlip,
 }: Props) {
@@ -79,6 +81,9 @@ export default function VocabCard({
       {flipped ? (
         <div className="flex w-full flex-col gap-4 pt-4 text-left">
           <div className="break-words font-heading text-[45px] font-bold text-ink">{front}</div>
+          {pronunciation && (
+            <div className="break-words text-[22px] text-ink-faint">{pronunciation}</div>
+          )}
           {meaning && (
             <div className="font-sans text-[31px] font-bold text-primary">{meaning}</div>
           )}
@@ -130,6 +135,11 @@ export default function VocabCard({
           <p className="w-full break-words text-center font-heading text-[58px] font-bold leading-tight text-ink">
             {front}
           </p>
+          {pronunciation && (
+            <p className="w-full break-words text-center text-[24px] text-ink-muted">
+              {pronunciation}
+            </p>
+          )}
           <span className="text-[24px] text-ink-faint">タップして意味を表示</span>
         </>
       )}
