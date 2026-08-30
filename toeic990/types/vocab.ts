@@ -21,4 +21,5 @@ export type VocabCardRow = {
   toeic_level: number | null;
   excluded: boolean;
   pronunciation: string | null;
+  part_of_speech: string | null;
 };
