@@ -10,9 +10,18 @@ type Props = {
   wordFamily: string | null;
   toeicLevel: number | null;
   pronunciation: string | null;
+  partOfSpeech: string | null;
   flipped: boolean;
   onFlip: () => void;
 };
+
+function PartOfSpeechBadge({ value }: { value: string }) {
+  return (
+    <span className="shrink-0 rounded-md bg-accent-soft px-2.5 py-1 text-[18px] font-bold text-accent-text">
+      {value}
+    </span>
+  );
+}
 
 function DifficultyStars({ level }: { level: number }) {
   return (
@@ -54,6 +63,7 @@ export default function VocabCard({
   wordFamily,
   toeicLevel,
   pronunciation,
+  partOfSpeech,
   flipped,
   onFlip,
 }: Props) {
@@ -81,8 +91,13 @@ export default function VocabCard({
       {flipped ? (
         <div className="flex w-full flex-col gap-4 pt-4 text-left">
           <div className="break-words font-heading text-[45px] font-bold text-ink">{front}</div>
-          {pronunciation && (
-            <div className="break-words text-[22px] text-ink-faint">{pronunciation}</div>
+          {(partOfSpeech || pronunciation) && (
+            <div className="flex flex-wrap items-center gap-2">
+              {partOfSpeech && <PartOfSpeechBadge value={partOfSpeech} />}
+              {pronunciation && (
+                <span className="break-words text-[22px] text-ink-faint">{pronunciation}</span>
+              )}
+            </div>
           )}
           {meaning && (
             <div className="font-sans text-[31px] font-bold text-primary">{meaning}</div>
@@ -135,10 +150,13 @@ export default function VocabCard({
           <p className="w-full break-words text-center font-heading text-[58px] font-bold leading-tight text-ink">
             {front}
           </p>
-          {pronunciation && (
-            <p className="w-full break-words text-center text-[24px] text-ink-muted">
-              {pronunciation}
-            </p>
+          {(partOfSpeech || pronunciation) && (
+            <div className="flex w-full flex-wrap items-center justify-center gap-2">
+              {partOfSpeech && <PartOfSpeechBadge value={partOfSpeech} />}
+              {pronunciation && (
+                <span className="break-words text-[24px] text-ink-muted">{pronunciation}</span>
+              )}
+            </div>
           )}
           <span className="text-[24px] text-ink-faint">タップして意味を表示</span>
         </>
