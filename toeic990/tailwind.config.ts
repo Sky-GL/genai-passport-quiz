@@ -63,6 +63,16 @@ const config: Config = {
       transitionTimingFunction: {
         spring: "cubic-bezier(0.32,0.72,0,1)",
       },
+      keyframes: {
+        pop: {
+          "0%": { transform: "scale(0.85)", opacity: "0" },
+          "60%": { transform: "scale(1.04)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+      },
+      animation: {
+        pop: "pop 0.32s cubic-bezier(0.32,0.72,0,1)",
+      },
     },
   },
   plugins: [],
