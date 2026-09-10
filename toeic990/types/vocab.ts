@@ -22,4 +22,6 @@ export type VocabCardRow = {
   excluded: boolean;
   pronunciation: string | null;
   part_of_speech: string | null;
+  // TOEIC Part5形式の出題文。対象語が「___」に置き換わっている
+  quiz_sentence: string | null;
 };

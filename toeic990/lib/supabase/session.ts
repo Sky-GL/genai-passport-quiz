@@ -1,12 +1,15 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDueVocabCards } from "@/lib/supabase/vocab";
-import { splitBack } from "@/lib/vocab-text";
+import { estimateToeicScore, type ScoreEstimate } from "@/lib/score-estimate";
 import type { VocabCardRow } from "@/types/vocab";
 import { SESSION_SIZE, type ActiveSession, type QuizQuestion } from "@/types/session";
 
 // 直近のセッションを判定するために読む行数(1セッション最大SESSION_SIZE行)
 const RECENT_ROW_LIMIT = SESSION_SIZE * 5;
 const CHOICE_COUNT = 4;
+
+// 予想スコアの算出に使う直近の回答数
+const ESTIMATE_WINDOW = 100;
 
 function shuffle<T>(items: T[]): T[] {
   const result = [...items];
@@ -43,10 +46,12 @@ export async function getActiveSession(userId: string): Promise<ActiveSession | 
   };
 }
 
-// 4択の誤答選択肢に使う、他カードの意味を集める
-async function getDistractorMeanings(excludeIds: string[]): Promise<string[]> {
+type DistractorWord = { front: string; partOfSpeech: string | null };
+
+// 4択の誤答に使う、他カードの見出し語を集める
+async function getDistractorWords(excludeIds: string[]): Promise<DistractorWord[]> {
   const supabase = await createSupabaseServerClient();
-  let query = supabase.from("vocab_cards").select("id, back").limit(120);
+  let query = supabase.from("vocab_cards").select("id, front, part_of_speech").limit(200);
   if (excludeIds.length > 0) {
     query = query.not("id", "in", `(${excludeIds.join(",")})`);
   }
@@ -54,31 +59,42 @@ async function getDistractorMeanings(excludeIds: string[]): Promise<string[]> {
   const { data, error } = await query;
   if (error) throw error;
 
-  return (data ?? []).map((row) => splitBack(row.back as string).meaning).filter(Boolean);
+  return (data ?? []).map((row) => ({
+    front: row.front as string,
+    partOfSpeech: (row.part_of_speech as string | null) ?? null,
+  }));
 }
 
-// 出題カードから4択問題を組み立てる。正解と解説はクライアントへ渡さない
+// 品詞が同じ語を優先して誤答を選ぶ。文法で消去できてしまう選択肢を減らすため
+function pickDistractors(pool: DistractorWord[], card: VocabCardRow): string[] {
+  const usable = pool.filter(
+    (item) => item.front.toLowerCase() !== card.front.toLowerCase() && item.front.length > 0
+  );
+  const samePos = card.part_of_speech
+    ? usable.filter((item) => item.partOfSpeech === card.part_of_speech)
+    : [];
+
+  const picked: string[] = [];
+  for (const candidate of [...shuffle(samePos), ...shuffle(usable)]) {
+    if (picked.length >= CHOICE_COUNT - 1) break;
+    if (!picked.includes(candidate.front)) picked.push(candidate.front);
+  }
+  return picked;
+}
+
+// 出題カードから空所補充問題を組み立てる。正解と意味はクライアントへ渡さない
 export async function buildQuizQuestions(cards: VocabCardRow[]): Promise<QuizQuestion[]> {
-  if (cards.length === 0) return [];
+  const usableCards = cards.filter((card) => !!card.quiz_sentence);
+  if (usableCards.length === 0) return [];
 
-  const pool = await getDistractorMeanings(cards.map((card) => card.id));
+  const pool = await getDistractorWords(usableCards.map((card) => card.id));
 
-  return cards.map((card) => {
-    const correct = splitBack(card.back).meaning;
-    const distractors = shuffle(pool.filter((meaning) => meaning !== correct)).slice(
-      0,
-      CHOICE_COUNT - 1
-    );
-
-    return {
-      cardId: card.id,
-      front: card.front,
-      pronunciation: card.pronunciation,
-      partOfSpeech: card.part_of_speech,
-      category: card.category,
-      choices: shuffle([correct, ...distractors]),
-    };
-  });
+  return usableCards.map((card) => ({
+    cardId: card.id,
+    sentence: card.quiz_sentence as string,
+    category: card.category,
+    choices: shuffle([card.front, ...pickDistractors(pool, card)]),
+  }));
 }
 
 // セッションを開始(または再開)し、残りの出題を返す
@@ -119,4 +135,38 @@ export async function recordSessionAnswer(
   });
 
   if (error) throw error;
+}
+
+// 直近の語彙問題の成績からTOEIC予想スコアを出す。回答数が少ないうちはnull
+export async function getScoreEstimate(userId: string): Promise<ScoreEstimate | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("session_progress")
+    .select("card_id, is_correct")
+    .eq("user_id", userId)
+    .order("answered_at", { ascending: false })
+    .limit(ESTIMATE_WINDOW);
+
+  if (error) throw error;
+  const rows = data ?? [];
+  if (rows.length === 0) return null;
+
+  const cardIds = Array.from(new Set(rows.map((row) => row.card_id as string)));
+  const { data: cards, error: cardError } = await supabase
+    .from("vocab_cards")
+    .select("id, toeic_level")
+    .in("id", cardIds);
+
+  if (cardError) throw cardError;
+
+  const levelById = new Map(
+    (cards ?? []).map((card) => [card.id as string, (card.toeic_level as number | null) ?? null])
+  );
+
+  return estimateToeicScore(
+    rows.map((row) => ({
+      isCorrect: row.is_correct as boolean,
+      level: levelById.get(row.card_id as string) ?? null,
+    }))
+  );
 }

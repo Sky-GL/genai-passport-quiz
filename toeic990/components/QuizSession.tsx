@@ -13,6 +13,25 @@ type Props = {
   total: number;
 };
 
+const CHOICE_LABELS = ["(A)", "(B)", "(C)", "(D)"];
+
+// 「___」の前後で英文を分け、空所だけ強調して表示する
+function BlankSentence({ sentence }: { sentence: string }) {
+  const parts = sentence.split("___");
+  return (
+    <p className="w-full break-words text-left text-[26px] leading-[1.7] text-ink">
+      {parts.map((part, i) => (
+        <span key={i}>
+          {part}
+          {i < parts.length - 1 && (
+            <span className="mx-1 inline-block min-w-[86px] border-b-[3px] border-primary align-baseline" />
+          )}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 export default function QuizSession({ sessionId, questions, answeredCount, total }: Props) {
   // セッション開始時点の出題リストを固定する(再取得でindexがずれないように)
   const [sessionQuestions] = useState(questions);
@@ -48,11 +67,14 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
     const answeredInThisRun = index;
     const accuracy =
       answeredInThisRun > 0 ? Math.round((stats.correct / answeredInThisRun) * 100) : 0;
+    const perfect = answeredInThisRun > 0 && stats.correct === answeredInThisRun;
 
     return (
       <div className="relative flex min-h-[360px] w-full max-w-[460px] flex-col items-center justify-center gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/25 blur-3xl" />
-        <p className="relative font-heading text-[30px] font-bold">セッション完了</p>
+        <p className="relative font-heading text-[30px] font-bold">
+          {perfect ? "満点！" : "セッション完了"}
+        </p>
         <p className="relative text-[20px] opacity-80">
           {answeredInThisRun}問 回答 ・ 正答率 {accuracy}% ・ +{stats.xp} XP
         </p>
@@ -81,29 +103,13 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
         />
       </div>
 
-      <div className="flex flex-col gap-4 rounded-xl2 bg-surface p-7 shadow-card">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <p className="w-full break-words font-heading text-[46px] font-bold leading-tight text-ink">
-            {current.front}
-          </p>
-          {(current.partOfSpeech || current.pronunciation) && (
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {current.partOfSpeech && (
-                <span className="shrink-0 rounded-md bg-accent-soft px-2.5 py-1 text-[18px] font-bold text-accent-text">
-                  {current.partOfSpeech}
-                </span>
-              )}
-              {current.pronunciation && (
-                <span className="text-[22px] text-ink-muted">{current.pronunciation}</span>
-              )}
-            </div>
-          )}
-        </div>
+      <div className="flex flex-col gap-5 rounded-xl2 bg-surface p-6 shadow-card sm:p-7">
+        <BlankSentence sentence={current.sentence} />
 
         <div className="flex flex-col gap-3">
-          {current.choices.map((choice) => {
+          {current.choices.map((choice, i) => {
             const isSelected = selected === choice;
-            const isCorrectChoice = result?.correctMeaning === choice;
+            const isCorrectChoice = result?.correctWord === choice;
             let stateClass =
               "border-border/50 text-ink hover:border-primary/40 hover:bg-primary-soft/40";
             if (result) {
@@ -122,9 +128,12 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
                 type="button"
                 disabled={!!result || isPending}
                 onClick={() => handleSelect(choice)}
-                className={`rounded-[11px] border px-4 py-4 text-left text-[24px] transition-all duration-300 ease-spring disabled:cursor-default ${stateClass}`}
+                className={`flex items-baseline gap-3 rounded-[11px] border px-4 py-4 text-left transition-all duration-300 ease-spring disabled:cursor-default ${stateClass}`}
               >
-                {choice}
+                <span className="shrink-0 text-[20px] font-bold opacity-60">
+                  {CHOICE_LABELS[i]}
+                </span>
+                <span className="min-w-0 break-words text-[24px]">{choice}</span>
               </button>
             );
           })}
