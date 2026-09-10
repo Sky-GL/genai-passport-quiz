@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "TOEIC990",
     short_name: "TOEIC990",
     description: "TOEIC990点取得を目指す学習アプリ",
-    start_url: "/dashboard",
+    start_url: "/",
     display: "standalone",
     background_color: "#0C0E1E",
     theme_color: "#0C0E1E",

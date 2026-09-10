@@ -9,7 +9,7 @@ import WeeklyXpChart from "@/components/WeeklyXpChart";
 import { DEFAULT_DAILY_GOAL } from "@/types";
 
 const MENU_ITEMS = [
-  { key: "vocab", label: "単語SRS", href: "/vocab", active: true },
+  { key: "vocab", label: "単語SRS", href: "/vocab/session", active: true },
   { key: "mock-test", label: "模試", href: "/mock-test", active: true },
   { key: "listening", label: "リスニング", href: "/listening", active: false },
   { key: "analytics", label: "弱点分析", href: "/analytics", active: false },
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
             </div>
             {remaining > 0 ? (
               <Link
-                href="/vocab"
+                href="/vocab/session"
                 className="relative mt-1 h-[55px] w-fit rounded-[9px] bg-white px-5 text-[22px] font-bold leading-[55px] text-primary-dark no-underline transition-all duration-300 ease-spring hover:scale-[0.98]"
               >
                 残り{remaining}枚を復習する
