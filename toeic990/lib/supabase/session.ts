@@ -150,9 +150,10 @@ export async function recordSessionAnswer(
 // 直近の語彙問題の成績からTOEIC予想スコアを出す。回答数が少ないうちはnull
 export async function getScoreEstimate(userId: string): Promise<ScoreEstimate | null> {
   const supabase = await createSupabaseServerClient();
+  // card_idの外部キーをたどって★の数も一度に取る(2クエリに分けると往復が1回増える)
   const { data, error } = await supabase
     .from("session_progress")
-    .select("card_id, is_correct")
+    .select("is_correct, vocab_cards(toeic_level)")
     .eq("user_id", userId)
     .order("answered_at", { ascending: false })
     .limit(ESTIMATE_WINDOW);
@@ -161,22 +162,19 @@ export async function getScoreEstimate(userId: string): Promise<ScoreEstimate | 
   const rows = data ?? [];
   if (rows.length === 0) return null;
 
-  const cardIds = Array.from(new Set(rows.map((row) => row.card_id as string)));
-  const { data: cards, error: cardError } = await supabase
-    .from("vocab_cards")
-    .select("id, toeic_level")
-    .in("id", cardIds);
-
-  if (cardError) throw cardError;
-
-  const levelById = new Map(
-    (cards ?? []).map((card) => [card.id as string, (card.toeic_level as number | null) ?? null])
-  );
-
   return estimateToeicScore(
     rows.map((row) => ({
       isCorrect: row.is_correct as boolean,
-      level: levelById.get(row.card_id as string) ?? null,
+      level: toLevel(row.vocab_cards),
     }))
   );
+}
+
+// PostgRESTの埋め込みは多対一なら単一オブジェクト、型定義上は配列になる。
+// どちらで返っても動くようにしておく(★が取れなければ既定値で評価される)
+function toLevel(embedded: unknown): number | null {
+  const card = Array.isArray(embedded) ? embedded[0] : embedded;
+  if (!card || typeof card !== "object") return null;
+  const level = (card as { toeic_level?: unknown }).toeic_level;
+  return typeof level === "number" ? level : null;
 }

@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { gradeCard, Rating } from "@/lib/fsrs";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getVocabCardById, rowToCard, updateVocabCardAfterReview } from "@/lib/supabase/vocab";
@@ -16,12 +15,16 @@ export async function submitQuizAnswer(
   selectedWord: string
 ): Promise<QuizAnswerResult> {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("未ログインです");
 
-  const row = await getVocabCardById(cardId);
+  // 認証確認とカード取得は互いに依存しないので同時に投げる(直列だと往復が1回増える)
+  const [
+    {
+      data: { user },
+    },
+    row,
+  ] = await Promise.all([supabase.auth.getUser(), getVocabCardById(cardId)]);
+
+  if (!user) throw new Error("未ログインです");
   if (!row) throw new Error("カードが見つかりません");
 
   // 正誤判定はサーバー側で行う(クライアントには正解を渡していない)
@@ -42,8 +45,10 @@ export async function submitQuizAnswer(
     ]);
   }
 
-  revalidatePath("/");
-  revalidatePath("/dashboard");
+  // ここでrevalidatePathを呼ぶと、1問ごとに/vocab/sessionの再描画
+  // (出題カードと誤答用の語の再取得)まで誘発して数百ms×往復ぶん遅くなる。
+  // / も /dashboard も動的レンダリング(キャッシュなし)なので、
+  // セッション終了時にクライアントからrouter.refresh()すれば十分。
 
   return {
     isCorrect,
