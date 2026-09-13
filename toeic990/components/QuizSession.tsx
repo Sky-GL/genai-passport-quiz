@@ -76,7 +76,9 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
     const answeredInThisRun = index;
     const accuracy =
       answeredInThisRun > 0 ? Math.round((stats.correct / answeredInThisRun) * 100) : 0;
-    const perfect = answeredInThisRun > 0 && stats.correct === answeredInThisRun;
+    // 途中再開の場合、前半の正誤はこの画面では分からないので満点とは言い切らない
+    const perfect =
+      answeredCount === 0 && answeredInThisRun > 0 && stats.correct === answeredInThisRun;
 
     return (
       <div className="relative flex min-h-[360px] w-full max-w-[460px] flex-col items-center justify-center gap-4 overflow-hidden rounded-xl3 bg-gradient-to-br from-primary via-primary to-navy px-6 py-8 text-center text-white shadow-hero">
