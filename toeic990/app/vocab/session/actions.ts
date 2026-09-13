@@ -58,6 +58,10 @@ export async function submitQuizAnswer(
     partOfSpeech: row.part_of_speech,
     // 空所が複数ある文でも全て埋める
     completedSentence: (row.quiz_sentence ?? "").split("___").join(row.front),
+    collocation: row.collocation,
+    etymology: row.etymology,
+    relatedWords: row.related_words,
+    wordFamily: row.word_family,
     xp: alreadyAnswered ? 0 : gradeXp,
   };
 }
