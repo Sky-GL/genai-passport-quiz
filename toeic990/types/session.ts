@@ -21,6 +21,10 @@ export type QuizAnswerResult = {
   partOfSpeech: string | null;
   // 空所を埋めた完成文
   completedSentence: string;
+  collocation: string | null;
+  etymology: string | null;
+  relatedWords: string | null;
+  wordFamily: string | null;
   xp: number;
 };
 

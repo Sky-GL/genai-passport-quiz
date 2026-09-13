@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { submitQuizAnswer } from "@/app/vocab/session/actions";
 import AnswerFeedback from "./AnswerFeedback";
 import type { QuizAnswerResult, QuizQuestion } from "@/types/session";
@@ -41,9 +42,17 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
   const [isPending, startTransition] = useTransition();
   const [stats, setStats] = useState({ correct: 0, xp: 0 });
   const [submitError, setSubmitError] = useState(false);
+  const router = useRouter();
 
   const current = sessionQuestions[index];
   const doneCount = answeredCount + index;
+  const finished = !current;
+
+  // 1問ごとにサーバー側でrevalidateすると回答が遅くなるため、
+  // トップ/ダッシュボードの更新はセッション終了時にまとめて1回だけ行う
+  useEffect(() => {
+    if (finished) router.refresh();
+  }, [finished, router]);
 
   const handleSelect = (choice: string) => {
     if (result || isPending) return;
@@ -72,7 +81,7 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
     setIndex((i) => i + 1);
   };
 
-  if (!current) {
+  if (finished) {
     const answeredInThisRun = index;
     const accuracy =
       answeredInThisRun > 0 ? Math.round((stats.correct / answeredInThisRun) * 100) : 0;
