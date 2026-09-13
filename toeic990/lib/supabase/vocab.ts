@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { withRetry } from "@/lib/supabase/retry";
+import { MASTERED_STABILITY_DAYS, MASTERED_STATE } from "@/lib/mastery";
 import type { Card } from "@/lib/fsrs";
 import type { VocabCardRow } from "@/types/vocab";
 
@@ -17,10 +18,7 @@ export function rowToCard(row: VocabCardRow): Card {
   };
 }
 
-// ts-fsrsのState: 2 = Review。安定度(記憶保持日数の目安)がこの日数を超えたReview状態のカードは
-// 十分習熟したとみなし、以後の復習対象から除外する
-const MASTERED_STATE = 2;
-const MASTERED_STABILITY_DAYS = 30;
+// 習熟の基準は到達度画面と共有する(lib/mastery.ts が唯一の定義)
 
 // Fisher-Yatesシャッフル。毎回同じ並び順にならないよう、出題直前にランダム化する
 function shuffle<T>(items: T[]): T[] {
