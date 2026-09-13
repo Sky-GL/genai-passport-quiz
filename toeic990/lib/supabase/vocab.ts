@@ -39,6 +39,8 @@ export async function getDueVocabCards(limit = 30, category?: string): Promise<V
     .select("*")
     .lte("due", new Date().toISOString())
     .eq("excluded", false)
+    // 出題文(空所補充)が無い語は出題できないので、件数を数える前に除外する
+    .not("quiz_sentence", "is", null)
     .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`)
     .order("due", { ascending: true })
     .limit(limit);
@@ -90,6 +92,7 @@ export async function getDueVocabCardCount(): Promise<number> {
     .select("id", { count: "exact", head: true })
     .lte("due", new Date().toISOString())
     .eq("excluded", false)
+    .not("quiz_sentence", "is", null)
     .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`);
 
   if (error) throw error;

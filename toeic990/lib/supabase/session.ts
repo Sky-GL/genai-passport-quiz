@@ -120,12 +120,18 @@ export async function startOrResumeSession(userId: string): Promise<{
   };
 }
 
+// 一意制約違反のコード(session_id, card_id の重複)
+const UNIQUE_VIOLATION = "23505";
+
+// 回答を記録する。すでに同じセッションで回答済みなら alreadyAnswered=true を返し、
+// 呼び出し側がFSRSの再採点とXPの二重付与を避けられるようにする。
+// (送信が一度失敗して再送された場合、insertのままだと重複エラーで永久に回答できなくなる)
 export async function recordSessionAnswer(
   userId: string,
   sessionId: string,
   cardId: string,
   isCorrect: boolean
-) {
+): Promise<{ alreadyAnswered: boolean }> {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("session_progress").insert({
     user_id: userId,
@@ -134,7 +140,11 @@ export async function recordSessionAnswer(
     is_correct: isCorrect,
   });
 
-  if (error) throw error;
+  if (error) {
+    if (error.code === UNIQUE_VIOLATION) return { alreadyAnswered: true };
+    throw error;
+  }
+  return { alreadyAnswered: false };
 }
 
 // 直近の語彙問題の成績からTOEIC予想スコアを出す。回答数が少ないうちはnull

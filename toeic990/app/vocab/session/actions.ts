@@ -30,14 +30,17 @@ export async function submitQuizAnswer(
   // 4択の結果をFSRSの評価に変換する
   const grade = isCorrect ? Rating.Good : Rating.Again;
   const nextCard = gradeCard(rowToCard(row), grade);
-  const xp = XP_BY_GRADE[grade];
+  const gradeXp = XP_BY_GRADE[grade];
 
-  // 1問ごとに即記録する(バッチ保存にしない)
-  await Promise.all([
-    updateVocabCardAfterReview(cardId, nextCard),
-    recordSessionAnswer(user.id, sessionId, cardId, isCorrect),
-    recordStudyActivity(xp),
-  ]);
+  // 1問ごとに即記録する(バッチ保存にしない)。
+  // 記録を先に行い、同じ問題の再送信ならFSRSとXPを二重に加算しない
+  const { alreadyAnswered } = await recordSessionAnswer(user.id, sessionId, cardId, isCorrect);
+  if (!alreadyAnswered) {
+    await Promise.all([
+      updateVocabCardAfterReview(cardId, nextCard),
+      recordStudyActivity(gradeXp),
+    ]);
+  }
 
   revalidatePath("/");
   revalidatePath("/dashboard");
@@ -48,7 +51,8 @@ export async function submitQuizAnswer(
     meaning: splitBack(row.back).meaning,
     pronunciation: row.pronunciation,
     partOfSpeech: row.part_of_speech,
-    completedSentence: (row.quiz_sentence ?? "").replace("___", row.front),
-    xp,
+    // 空所が複数ある文でも全て埋める
+    completedSentence: (row.quiz_sentence ?? "").split("___").join(row.front),
+    xp: alreadyAnswered ? 0 : gradeXp,
   };
 }
