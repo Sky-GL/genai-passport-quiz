@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { withRetry } from "@/lib/supabase/retry";
 import type { Choice, GrammarQuestionPublic } from "@/types/grammar";
 
 const PUBLIC_COLUMNS = "id, category, question_text, choice_a, choice_b, choice_c, choice_d";
@@ -98,20 +99,22 @@ export async function checkGrammarAnswer(
   questionId: string,
   selected: Choice
 ): Promise<{ isCorrect: boolean; correctChoice: Choice; explanation: string }> {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("grammar_questions")
-    .select("correct_choice, explanation")
-    .eq("id", questionId)
-    .single();
+  return withRetry(async () => {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("grammar_questions")
+      .select("correct_choice, explanation")
+      .eq("id", questionId)
+      .single();
 
-  if (error || !data) throw error ?? new Error("問題が見つかりません");
+    if (error || !data) throw error ?? new Error("問題が見つかりません");
 
-  return {
-    isCorrect: data.correct_choice === selected,
-    correctChoice: data.correct_choice as Choice,
-    explanation: data.explanation,
-  };
+    return {
+      isCorrect: data.correct_choice === selected,
+      correctChoice: data.correct_choice as Choice,
+      explanation: data.explanation,
+    };
+  });
 }
 
 export async function recordGrammarAnswer(

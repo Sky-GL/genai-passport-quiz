@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { withRetry } from "@/lib/supabase/retry";
 import type { Card } from "@/lib/fsrs";
 import type { VocabCardRow } from "@/types/vocab";
 
@@ -95,16 +96,26 @@ export async function getDueVocabCardCount(): Promise<number> {
   return count ?? 0;
 }
 
-export async function getVocabCardById(id: string): Promise<VocabCardRow | null> {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("vocab_cards")
-    .select("*")
-    .eq("id", id)
-    .single();
+// PostgRESTが「該当行なし」を返すときのコード
+const NO_ROWS_CODE = "PGRST116";
 
-  if (error) return null;
-  return data;
+export async function getVocabCardById(id: string): Promise<VocabCardRow | null> {
+  return withRetry(async () => {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("vocab_cards")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    // 通信エラーを「カードなし」と同じnullで返すと、一時的な失敗が
+    // 「カードが見つかりません」になって画面ごと落ちるため、ここで区別する
+    if (error) {
+      if (error.code === NO_ROWS_CODE) return null;
+      throw error;
+    }
+    return data;
+  });
 }
 
 export async function updateVocabCardAfterReview(id: string, card: Card, excluded = false) {

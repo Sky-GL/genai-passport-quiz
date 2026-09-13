@@ -40,6 +40,7 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
   const [result, setResult] = useState<QuizAnswerResult | null>(null);
   const [isPending, startTransition] = useTransition();
   const [stats, setStats] = useState({ correct: 0, xp: 0 });
+  const [submitError, setSubmitError] = useState(false);
 
   const current = sessionQuestions[index];
   const doneCount = answeredCount + index;
@@ -47,19 +48,27 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
   const handleSelect = (choice: string) => {
     if (result || isPending) return;
     setSelected(choice);
+    setSubmitError(false);
     startTransition(async () => {
-      const res = await submitQuizAnswer(sessionId, current.cardId, choice);
-      setResult(res);
-      setStats((s) => ({
-        correct: s.correct + (res.isCorrect ? 1 : 0),
-        xp: s.xp + res.xp,
-      }));
+      try {
+        const res = await submitQuizAnswer(sessionId, current.cardId, choice);
+        setResult(res);
+        setStats((s) => ({
+          correct: s.correct + (res.isCorrect ? 1 : 0),
+          xp: s.xp + res.xp,
+        }));
+      } catch {
+        // 通信が一時的に失敗しただけならセッションを壊さず、同じ問題を選び直せるようにする
+        setSelected(null);
+        setSubmitError(true);
+      }
     });
   };
 
   const handleNext = () => {
     setSelected(null);
     setResult(null);
+    setSubmitError(false);
     setIndex((i) => i + 1);
   };
 
@@ -138,6 +147,12 @@ export default function QuizSession({ sessionId, questions, answeredCount, total
             );
           })}
         </div>
+
+        {submitError && (
+          <p role="alert" className="text-[20px] leading-relaxed text-danger-text">
+            通信に失敗しました。もう一度選択してください。
+          </p>
+        )}
 
         {result && <AnswerFeedback result={result} />}
       </div>

@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { withRetry } from "@/lib/supabase/retry";
 import type { Choice, MockTestSet } from "@/types/mocktest";
 
 const PUBLIC_COLUMNS =
@@ -22,20 +23,22 @@ export async function checkMockTestAnswer(
   questionId: string,
   selected: Choice
 ): Promise<{ isCorrect: boolean; correctChoice: Choice; explanation: string }> {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("mock_test_questions")
-    .select("correct_choice, explanation")
-    .eq("id", questionId)
-    .single();
+  return withRetry(async () => {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("mock_test_questions")
+      .select("correct_choice, explanation")
+      .eq("id", questionId)
+      .single();
 
-  if (error || !data) throw error ?? new Error("問題が見つかりません");
+    if (error || !data) throw error ?? new Error("問題が見つかりません");
 
-  return {
-    isCorrect: data.correct_choice === selected,
-    correctChoice: data.correct_choice as Choice,
-    explanation: data.explanation,
-  };
+    return {
+      isCorrect: data.correct_choice === selected,
+      correctChoice: data.correct_choice as Choice,
+      explanation: data.explanation,
+    };
+  });
 }
 
 export async function getCorrectAnswers(
