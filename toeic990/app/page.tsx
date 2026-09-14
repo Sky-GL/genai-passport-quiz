@@ -2,8 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveSession, getScoreEstimate } from "@/lib/supabase/session";
+import { getFocusRemainingCount } from "@/lib/supabase/vocab";
 import { MIN_SAMPLE_FOR_ESTIMATE } from "@/lib/score-estimate";
 import { SESSION_SIZE } from "@/types/session";
+
+// 990レベル。トップから直接集中出題できるようにしている
+const TOP_LEVEL = 5;
 
 export default async function Home() {
   const supabase = await createSupabaseServerClient();
@@ -15,9 +19,10 @@ export default async function Home() {
     redirect("/login");
   }
 
-  const [active, estimate] = await Promise.all([
+  const [active, estimate, topLevelRemaining] = await Promise.all([
     getActiveSession(user.id),
     getScoreEstimate(user.id),
+    getFocusRemainingCount(TOP_LEVEL),
   ]);
   const answered = active?.answeredCount ?? 0;
   const remaining = SESSION_SIZE - answered;
@@ -54,6 +59,21 @@ export default async function Home() {
           {resuming ? "続きから" : "はじめる"}
         </div>
       </Link>
+
+      {topLevelRemaining > 0 && (
+        <Link
+          href={`/vocab/session?level=${TOP_LEVEL}`}
+          className="flex items-center justify-between gap-4 rounded-xl2 bg-surface p-6 no-underline shadow-card transition-all duration-300 ease-spring hover:-translate-y-0.5 hover:shadow-hover"
+        >
+          <span className="flex min-w-0 flex-col gap-1">
+            <span className="text-[22px] font-bold text-accent-text">★★★★★ に集中</span>
+            <span className="text-[18px] leading-relaxed text-ink-muted">
+              990レベルの語だけを10問。残り{topLevelRemaining}語
+            </span>
+          </span>
+          <span className="shrink-0 text-[26px] font-bold text-ink-faint">›</span>
+        </Link>
+      )}
 
       <div className="flex flex-col gap-3 rounded-xl2 bg-surface p-6 shadow-card">
         <div className="text-[18px] font-bold uppercase tracking-[0.1em] text-ink-faint">

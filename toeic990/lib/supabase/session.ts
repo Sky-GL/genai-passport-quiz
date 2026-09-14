@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getDueVocabCards } from "@/lib/supabase/vocab";
+import { getDueVocabCards, getFocusVocabCards } from "@/lib/supabase/vocab";
 import { estimateToeicScore, type ScoreEstimate } from "@/lib/score-estimate";
 import type { VocabCardRow } from "@/types/vocab";
 import { SESSION_SIZE, type ActiveSession, type QuizQuestion } from "@/types/session";
@@ -46,12 +46,15 @@ export async function getActiveSession(userId: string): Promise<ActiveSession | 
   };
 }
 
-type DistractorWord = { front: string; partOfSpeech: string | null };
+type DistractorWord = { front: string; partOfSpeech: string | null; level: number | null };
 
 // 4択の誤答に使う、他カードの見出し語を集める
 async function getDistractorWords(excludeIds: string[]): Promise<DistractorWord[]> {
   const supabase = await createSupabaseServerClient();
-  let query = supabase.from("vocab_cards").select("id, front, part_of_speech").limit(200);
+  let query = supabase
+    .from("vocab_cards")
+    .select("id, front, part_of_speech, toeic_level")
+    .limit(200);
   if (excludeIds.length > 0) {
     query = query.not("id", "in", `(${excludeIds.join(",")})`);
   }
@@ -62,10 +65,13 @@ async function getDistractorWords(excludeIds: string[]): Promise<DistractorWord[
   return (data ?? []).map((row) => ({
     front: row.front as string,
     partOfSpeech: (row.part_of_speech as string | null) ?? null,
+    level: (row.toeic_level as number | null) ?? null,
   }));
 }
 
-// 品詞が同じ語を優先して誤答を選ぶ。文法で消去できてしまう選択肢を減らすため
+// 誤答は「同じ品詞かつ同じ難易度」を最優先で選ぶ。
+// 品詞が違うと文法だけで消去でき、難易度が違うと(★5の問題に★1の語が混ざるなど)
+// 知っている語を外すだけで正解できてしまうため
 function pickDistractors(pool: DistractorWord[], card: VocabCardRow): string[] {
   const usable = pool.filter(
     (item) => item.front.toLowerCase() !== card.front.toLowerCase() && item.front.length > 0
@@ -73,9 +79,18 @@ function pickDistractors(pool: DistractorWord[], card: VocabCardRow): string[] {
   const samePos = card.part_of_speech
     ? usable.filter((item) => item.partOfSpeech === card.part_of_speech)
     : [];
+  const sameLevel = card.toeic_level
+    ? usable.filter((item) => item.level === card.toeic_level)
+    : [];
+  const best = samePos.filter((item) => item.level === card.toeic_level);
 
   const picked: string[] = [];
-  for (const candidate of [...shuffle(samePos), ...shuffle(usable)]) {
+  for (const candidate of [
+    ...shuffle(best),
+    ...shuffle(sameLevel),
+    ...shuffle(samePos),
+    ...shuffle(usable),
+  ]) {
     if (picked.length >= CHOICE_COUNT - 1) break;
     if (!picked.includes(candidate.front)) picked.push(candidate.front);
   }
@@ -97,8 +112,12 @@ export async function buildQuizQuestions(cards: VocabCardRow[]): Promise<QuizQue
   }));
 }
 
-// セッションを開始(または再開)し、残りの出題を返す
-export async function startOrResumeSession(userId: string): Promise<{
+// セッションを開始(または再開)し、残りの出題を返す。
+// focusLevelを渡すとその★の語だけを集中的に出す(due日時は無視)
+export async function startOrResumeSession(
+  userId: string,
+  focusLevel?: number
+): Promise<{
   sessionId: string;
   answeredCount: number;
   questions: QuizQuestion[];
@@ -110,8 +129,11 @@ export async function startOrResumeSession(userId: string): Promise<{
   const remaining = SESSION_SIZE - answeredCount;
 
   // 回答済みカードを除くため、必要数より多めに取得してから絞り込む
-  const due = await getDueVocabCards(remaining + answeredCardIds.length);
-  const cards = due.filter((card) => !answeredCardIds.includes(card.id)).slice(0, remaining);
+  const fetchLimit = remaining + answeredCardIds.length;
+  const pool = focusLevel
+    ? await getFocusVocabCards(focusLevel, fetchLimit)
+    : await getDueVocabCards(fetchLimit);
+  const cards = pool.filter((card) => !answeredCardIds.includes(card.id)).slice(0, remaining);
 
   return {
     sessionId,
