@@ -37,9 +37,8 @@ function StackedBar({ counts, total }: { counts: Record<MasteryBucket, number>; 
 function LevelRow({ entry }: { entry: LevelProgress }) {
   const done = entry.counts.mastered + entry.counts.settling;
   const label = entry.level > 0 ? "★".repeat(entry.level) : "未設定";
-
-  return (
-    <div className="flex flex-col gap-2">
+  const body = (
+    <>
       <div className="flex items-baseline justify-between gap-3">
         <span className="min-w-0 truncate text-[21px] font-bold text-accent-text">{label}</span>
         <span className="shrink-0 whitespace-nowrap text-[19px] text-ink-muted">
@@ -47,8 +46,22 @@ function LevelRow({ entry }: { entry: LevelProgress }) {
         </span>
       </div>
       <StackedBar counts={entry.counts} total={entry.total} />
-    </div>
+    </>
   );
+
+  // ★が付いている行は、その難易度だけの集中出題へ直接入れるようにする
+  if (entry.level > 0) {
+    return (
+      <Link
+        href={`/vocab/session?level=${entry.level}`}
+        className="flex flex-col gap-2 rounded-[10px] p-1 no-underline transition-all duration-300 ease-spring hover:bg-primary-soft/60"
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return <div className="flex flex-col gap-2 p-1">{body}</div>;
 }
 
 type Props = {
@@ -124,7 +137,7 @@ export default function MasteryReport({ overview, weakWords }: Props) {
             難易度別の到達度
           </h2>
           <p className="text-[17px] leading-relaxed text-ink-muted">
-            ★5が990レベル。満点を狙うならここを残さないことが目標になります。
+            ★5が990レベル。満点を狙うならここを残さないことが目標になります。行をタップすると、その難易度だけを集中して出題します。
           </p>
         </div>
         {overview.byLevel.map((entry) => (

@@ -53,6 +53,41 @@ export async function getDueVocabCards(limit = 30, category?: string): Promise<V
   return shuffle(data ?? []);
 }
 
+// 難易度(★)を絞った集中出題。★5=990レベルを潰したいときに使う。
+// due日時は無視し、定着していない語(stabilityが低い順=未学習が先頭)から出す
+export async function getFocusVocabCards(level: number, limit = 30): Promise<VocabCardRow[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("vocab_cards")
+    .select("*")
+    .eq("toeic_level", level)
+    .eq("excluded", false)
+    .not("quiz_sentence", "is", null)
+    .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`)
+    .order("stability", { ascending: true })
+    .order("due", { ascending: true })
+    .limit(limit);
+
+  if (error) throw error;
+  // 選抜は「定着していない順」、提示順はランダムにする
+  return shuffle(data ?? []);
+}
+
+// 集中出題の対象として残っている語数
+export async function getFocusRemainingCount(level: number): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("vocab_cards")
+    .select("id", { count: "exact", head: true })
+    .eq("toeic_level", level)
+    .eq("excluded", false)
+    .not("quiz_sentence", "is", null)
+    .or(`state.neq.${MASTERED_STATE},stability.lt.${MASTERED_STABILITY_DAYS}`);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
 // 苦手復習: lapses(失敗回数)が多い順、次いでdifficultyが高い順に出題する。
 // due日時は問わず、習熟済み(mastered)のカードのみ除外する
 export async function getWeakVocabCards(limit = 20): Promise<VocabCardRow[]> {
