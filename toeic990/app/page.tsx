@@ -90,12 +90,20 @@ export default async function Home() {
         )}
       </div>
 
-      <Link
-        href="/dashboard"
-        className="text-center text-[18px] text-ink-muted no-underline transition-all duration-300 hover:text-ink"
-      >
-        ダッシュボードを見る
-      </Link>
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        <Link
+          href="/vocab/progress"
+          className="text-[18px] text-ink-muted no-underline transition-all duration-300 hover:text-ink"
+        >
+          到達度を見る
+        </Link>
+        <Link
+          href="/dashboard"
+          className="text-[18px] text-ink-muted no-underline transition-all duration-300 hover:text-ink"
+        >
+          ダッシュボードを見る
+        </Link>
+      </div>
     </main>
   );
 }
