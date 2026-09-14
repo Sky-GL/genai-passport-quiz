@@ -46,6 +46,10 @@ TOEIC990点取得を目指す学習者向けの学習アプリ。Web優先（Nex
 - **モバイルのレスポンシブ対応を忘れやすい**。ヘッダー等の横並びバッジ+テキストの`flex items-center justify-between`は、スマホ幅で子要素が潰れて縦書きのように折り返される事故が起きた。バッジ類には`shrink-0 whitespace-nowrap`、可変長テキストには`min-w-0 truncate`、必要なら`flex-col sm:flex-row`で段組みを切り替える
 - **DBスキーマ変更を伴う機能は、SQL実行を確認してからデプロイする**。新カラムを参照するコードを先にmainへ出すと、SQL未実行の間ずっと本番が落ちる(実際に`grammar_answers.ever_incorrect`で「Application error: a server-side exception has occurred」を発生させた)。順序は必ず「①SQL実行の完了を確認 → ②mainへマージ」。SQLが2本以上ある場合は、どれが未実行かを取り違えやすいので、デプロイ前に`information_schema.columns`等で実際にカラムが存在するか確認する
 
+- **色に`<alpha-value>`を付け忘れると、不透明度指定が無言で透明になる**。`oklch(...)`にはアルファの差し込み口が無いため、`oklch(0.56 0.19 265)`のまま定義すると`bg-primary/55`が`rgba(0,0,0,0)`になる。エラーは一切出ず、要素の幅だけ残って色が消えるので気づきにくい(実際に15ファイル38箇所が長期間この状態だった)。`tailwind.config.ts`に色を追加するときは必ず`oklch(... / <alpha-value>)`の形にする
+- **設定ファイル(tailwind.config.ts等)を変更したら、devサーバーを再起動して`.next`を消す**。ホットリロードでは反映されず、直したのに直っていないように見える。またdevサーバーを多重起動すると古いルート定義が残って404になるので、`ps -eo pid,args | grep "[n]ext"`でPIDを特定して落とす(`pkill -f "next dev"`は自分のシェルまで巻き込んで落ちる)
+- **認証が必要な画面の見た目は、表示部分をコンポーネントに切り出して一時ページでプレビューすれば確認できる**。`app/auth-preview/`に置くとミドルウェアの認証チェックを通らずに済む(`/auth`で始まるパスは公開扱い)。確認後は必ず削除し、`.next`も消してから`npm run typecheck`する(消したページの型定義が残ってエラーになる)
+
 ## デザイントークン(tailwind.config.ts)
 - 角丸: `rounded-xl2`(20px)を通常カード、`rounded-xl3`(28px)をヒーロー/達成演出カードに使う
 - シャドウ: `shadow-flat`/`shadow-card`/`shadow-hover`が通常カード用、`shadow-glow`(発光)と`shadow-hero`(大型グラデーションカード用)がアクセント
